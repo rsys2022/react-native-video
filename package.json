@@ -63,12 +63,12 @@
         "TextTrackType.js",
         "VideoResizeMode.js",
         "react-native-video.podspec",
-        "index.web.js",
         "index.html",
         "Video.App.js",
         "web",
         "webpack.config.js",
         "index.ios.js",
-        "index.android.js"
+        "index.android.js",
+        "index.web.js"
     ]
 }
