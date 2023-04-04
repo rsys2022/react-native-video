@@ -87,18 +87,17 @@ const PercentageBar = ({
           
         </View>
                     
-        <View style={styles.barStyle}/>
+        <View style={[styles.barStyle, { width: percentage ? percentage : 0,backgroundColor: getCompletedColor,}]}/>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
     barStyle : {
-            width: percentage ? percentage : 0,
             height: 5,
             // marginVertical: 10,
             borderRadius: 5,
-            backgroundColor: getCompletedColor,
+            
             position: 'absolute',
             bottom:20
           }
