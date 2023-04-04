@@ -159,6 +159,14 @@ class ReactExoplayerView extends FrameLayout implements
     private boolean controls;
     // \ End props
 
+
+    private ArrayList<String> eventStack = new ArrayList<>();
+    private ArrayList<TrackingEventObj> TrackListing = new ArrayList<>();
+    private ReadableMap trackingJson = null;
+    private boolean isAdsPlaying = false;
+    private int skipToTimeInMs = 0;
+    private int completeCount = 0;
+
     // React
     private final ThemedReactContext themedReactContext;
     private final AudioManager audioManager;
@@ -175,6 +183,13 @@ class ReactExoplayerView extends FrameLayout implements
                             ) {
                         long pos = player.getCurrentPosition();
                         long bufferedDuration = player.getBufferedPercentage() * player.getDuration() / 100;
+                        try {
+                            if(TrackListing.size() > 0) {
+                                OnTimeUpdate(pos);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         eventEmitter.progressChanged(pos, bufferedDuration, player.getDuration(), getPositionInFirstPeriodMsForCurrentWindow(pos));
                         msg = obtainMessage(SHOW_PROGRESS);
                         sendMessageDelayed(msg, Math.round(mProgressUpdateInterval));
@@ -183,6 +198,67 @@ class ReactExoplayerView extends FrameLayout implements
             }
         }
     };
+
+
+
+    private boolean isPlayingAd() {
+        return player != null && player.isPlayingAd() && !isAdsPlaying;
+    }
+
+    public void OnTimeUpdate(long currentPosition) throws IOException {
+        float currentTime = currentPosition / 1000;
+        /** New Start **/
+        for(int i = 0; i< TrackListing.size(); i++) {
+            double time = TrackListing.get(i).getTime();
+            if ((int)time == (int)currentTime) {
+                String eventType = TrackListing.get(i).getEventType();
+                boolean value = eventStack.contains(eventType);
+                String eventTypeTime = eventType + " "+ String.valueOf(time);
+                Log.d("dataEs current ", String.valueOf(TrackListing.get(i).getTime()));
+                if (value == false) {
+                    List<String> beaconUrls = TrackListing.get(i).getBeaconUrls();
+                    eventEmitter.onEventFired(eventTypeTime);
+                    eventStack.add(eventType);
+                    new ApacheApi().execute(beaconUrls.get(0));
+                }
+            }
+
+            double start = TrackListing.get(i).getStart();
+            double end = TrackListing.get(i).getEnd();
+            double skipOffset = TrackListing.get(i).getSkipOffset();
+            double duration = TrackListing.get(i).getDuration();
+//            double currentDiff = currentTime - start;
+            if ((int)start < (int)currentTime && (int)currentTime < (int)end){
+
+                if(isAdsPlaying == false) {
+                    eventEmitter.toStartCountdown(duration);
+                    isAdsPlaying = true;
+//                      setCountDownTime(duration - currentDiff);
+                    eventEmitter.toShowAnimateBar(true);
+                    playerControlView.hide();
+                }
+                if ((int) start + (int) skipOffset == (int)currentTime) {
+                    int skipTo = (int)end;
+                    int durationTime = (int)duration;
+                    skipToTimeInMs = skipTo;
+                    eventEmitter.toShowSkip(true, skipToTimeInMs, durationTime);
+
+                }
+                double animateBarCount = (currentTime - start) / (end - start);
+                eventEmitter.toUpdateAnimateBar(animateBarCount);
+
+            }
+            if ((int)end == (int)currentTime) {
+                isAdsPlaying = false;
+                eventEmitter.toShowAnimateBar(false);
+                eventEmitter.toShowSkip(false, 0, 0);
+            }
+            if ((int)currentTime == 11.00) {
+                eventStack.clear();
+            }
+        }
+
+    }
     
     public double getPositionInFirstPeriodMsForCurrentWindow(long currentPosition) {
         Timeline.Window window = new Timeline.Window();
@@ -322,7 +398,9 @@ class ReactExoplayerView extends FrameLayout implements
         exoPlayerView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                togglePlayerControlVisibility();
+               if (!isPlayingAd() && !isAdsPlaying) {
+                    togglePlayerControlVisibility();
+                 }
             }
         });
 
@@ -1354,6 +1432,46 @@ class ReactExoplayerView extends FrameLayout implements
     public void setDrmLicenseHeader(String[] header){
         this.drmLicenseHeader = header;
     }
+
+    public void setTrackingJsonModifier(ReadableMap trackJson) {
+        if(trackJson == null){
+            return;
+
+        }
+        HashMap<String, Object> timeObj= new HashMap(trackJson.toHashMap());
+        Map<String, Object> map = (Map<String, Object>)timeObj;
+
+
+        for(String key : map.keySet()) {
+            String[] arr = String.valueOf(map.get(key)).split(",");
+            String[] beaconArray = String.valueOf(arr[0]).split("=");
+            String[] durationArray = String.valueOf(arr[1]).split("=");
+            String[] startArray = String.valueOf(arr[2]).split("=");
+            String[] endArray = String.valueOf(arr[3]).split("=");
+            String[] timeArray = String.valueOf(arr[4]).split("=");
+            String[] eventTypeArray = String.valueOf(arr[5]).split("=");
+            String[] skipBarcArray = String.valueOf(arr[6]).split("=");
+            StringBuffer sb = new StringBuffer(skipBarcArray[1]);
+            sb.deleteCharAt(sb.length()-1);
+            // invoking method
+            String SkipOffsetVal = String.valueOf(sb);
+            String[] arrSplitStartBr = String.valueOf(beaconArray[1]).split("\\[");
+            String[] arrSplitEndBr = String.valueOf(arrSplitStartBr[1]).split("]");
+            TrackingEventObj tracks = new TrackingEventObj();
+
+            tracks.setBeaconUrls(Arrays.asList(arrSplitEndBr[0]));
+            tracks.setDuration(Double.parseDouble(durationArray[1]));
+            tracks.setStart(Double.parseDouble(startArray[1]));
+            tracks.setEnd(Double.parseDouble(endArray[1]));
+            tracks.setTime(Double.parseDouble(timeArray[1]));
+            tracks.setEventType(eventTypeArray[1]);
+            tracks.setSkipOffset(Double.parseDouble(SkipOffsetVal));
+
+            TrackListing.add(tracks);
+        }
+        Log.d("time TrackListing", String.valueOf(TrackListing));
+    }
+
 
 
     @Override

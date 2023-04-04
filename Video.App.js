@@ -7,7 +7,7 @@ import TextTrackType from './TextTrackType';
 import FilterType from './FilterType';
 import DRMType from './DRMType';
 import VideoResizeMode from './VideoResizeMode.js';
-
+import PercentageBar from "./nativeCustomManager/progress.js";
 const styles = StyleSheet.create({
   base: {
     overflow: 'hidden',
@@ -23,6 +23,13 @@ export default class Video extends Component {
 
     this.state = {
       showPoster: !!props.poster,
+
+      updateTime: 0,
+      showBar: false,
+      showSkip: false,
+      initialCountdown: 0,
+      skipTo: null,
+      pause: false,
     };
   }
 
@@ -261,11 +268,76 @@ export default class Video extends Component {
     return NativeModules.UIManager.getViewManagerConfig(viewManagerName);
   };
 
+
+
+  stringToSec = (timeString) => {
+    const arr = timeString.split(":");
+    const seconds = arr[0] * 3600 + arr[1] * 60 + +arr[2];
+    return seconds;
+  };
+
+  parseTrackingJson=()=> {
+    var trackAvails = [...this.props.trackingJson.avails];
+    var newData = {};
+
+    trackAvails.forEach((element) => {
+      element.ads.forEach((adElement) => {
+        let data = adElement.trackingEvents.reduce(
+          (previousObject, currentObject) => {
+            const time = parseInt(currentObject.startTimeInSeconds);
+            return Object.assign(previousObject, {
+              [time]: {
+                time: currentObject.startTimeInSeconds,
+                eventType: currentObject.eventType,
+                beaconUrls: ["https://randomuser.me/api/"],
+                start: element.startTimeInSeconds,
+                end: element.startTimeInSeconds + element.durationInSeconds,
+                duration: element.durationInSeconds,
+                skipOffset: this.stringToSec(adElement.skipOffset),
+              },
+            });
+          },
+          {}
+        );
+        newData = { ...newData, ...data };
+      });
+    });
+    return newData;
+  }
+
+  _onUpdateAnimateBar = (event) => {
+    // this.setState({showBar: event.nativeEvent.isBarHidden})
+    this.setState({updateTime: event.nativeEvent.animateValue})
+    // console.log("event", event.nativeEvent)
+  }
+
+  _onShowAnimateBar=(event)=>{
+    this.setState({showBar: event.nativeEvent.isBarHidden})
+  }
+
+  _onShowSkip=(event) => {
+    // console.log("skipTo",event.nativeEvent.skipTo)
+    this.setState({showSkip: event.nativeEvent.isShowSkip, skipTo: event.nativeEvent.skipTo === 0 ? null: event.nativeEvent.skipTo})
+  }
+
+  _toStartCountdown= (event) => {
+    // console.log("initialCountdown",event.nativeEvent.startCountdownAt)
+    this.setState({initialCountdown: event.nativeEvent.startCountdownAt * 1000})
+  }
+
+  _onEventFired=(event)=> {
+    console.log("event fired > ",event.nativeEvent.eventName)
+  }
+
+
+
+
   render() {
     const resizeMode = this.props.resizeMode;
     const source = resolveAssetSource(this.props.source) || {};
     const shouldCache = !source.__packager_asset;
 
+    const trackJson = this.props.trackingJson !== null ? this.parseTrackingJson() : null;
     let uri = source.uri || '';
     if (uri && uri.match(/^\//)) {
       uri = `file://${uri}`;
@@ -305,6 +377,7 @@ export default class Video extends Component {
         patchVer: source.patchVer || 0,
         requestHeaders: source.headers ? this.stringsOnlyObject(source.headers) : {},
       },
+      trackingJson: trackJson,
       onVideoLoadStart: this._onLoadStart,
       onVideoLoad: this._onLoad,
       onVideoError: this._onError,
@@ -329,6 +402,12 @@ export default class Video extends Component {
       onGetLicense: nativeProps.drm && nativeProps.drm.getLicense && this._onGetLicense,
       onPictureInPictureStatusChanged: this._onPictureInPictureStatusChanged,
       onRestoreUserInterfaceForPictureInPictureStop: this._onRestoreUserInterfaceForPictureInPictureStop,
+
+      toUpdateAnimateBar: this._onUpdateAnimateBar,
+      toShowAnimateBar: this._onShowAnimateBar,
+      toShowSkip: this._onShowSkip,
+      toStartCountdown: this._toStartCountdown,
+      onEventFired: this._onEventFired,
     });
 
     const posterStyle = {
@@ -346,6 +425,16 @@ export default class Video extends Component {
         {this.state.showPoster && (
           <Image style={posterStyle} source={{ uri: this.props.poster }} />
         )}
+        {this.state.showBar && 
+          <PercentageBar 
+            percentage={`${parseInt((this.state.updateTime*100)+1)}%`} 
+            showSkip={this.state.showSkip}
+            onSkipPress={()=> this.seek(this.state.skipTo+1)}
+            initialTime={9000}
+            playPauseCall={(value)=> this.setState({pause: value})}
+            isPaused={this.props.paused || this.state.pause}
+          />
+          }
       </View>
     );
   }
@@ -507,6 +596,8 @@ Video.propTypes = {
   translateX: PropTypes.number,
   translateY: PropTypes.number,
   rotation: PropTypes.number,
+  
+  trackingJson: PropTypes.object,
   ...ViewPropTypes,
 };
 

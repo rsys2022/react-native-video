@@ -20,6 +20,10 @@
         {
             "name": "Hampton Maxwell",
             "email": "me@hamptonmaxwell.com"
+        },
+        {
+            "name": "Leena Sharma",
+            "email": "Leena.Sharma@rsystems.com"
         }
     ],
     "repository": {
@@ -55,7 +59,6 @@
     "files": [
         "android-exoplayer",
         "android",
-        "dom",
         "ios",
         "windows",
         "FilterType.js",
@@ -69,6 +72,7 @@
         "webpack.config.js",
         "index.ios.js",
         "index.android.js",
-        "index.web.js"
+        "index.web.js",
+        "nativeCustomManager"
     ]
 }

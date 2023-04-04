@@ -48,6 +48,14 @@ class VideoEventEmitter {
     private static final String EVENT_AUDIO_FOCUS_CHANGE = "onAudioFocusChanged";
     private static final String EVENT_PLAYBACK_RATE_CHANGE = "onPlaybackRateChange";
 
+
+
+    private static final String EVENT_TO_ANIMATE_BAR = "toUpdateAnimateBar";
+    private static final String EVENT_TO_HIDE_AD_BAR = "toShowAnimateBar";
+    private static final String EVENT_TO_SHOW_SKIP = "toShowSkip";
+    private static final String EVENT_TO_START_COUNTDOWN = "toStartCountdown";
+    private static final String EVENT_NAME_FIRED = "onEventFired";
+
     static final String[] Events = {
             EVENT_LOAD_START,
             EVENT_LOAD,
@@ -69,6 +77,13 @@ class VideoEventEmitter {
             EVENT_AUDIO_FOCUS_CHANGE,
             EVENT_PLAYBACK_RATE_CHANGE,
             EVENT_BANDWIDTH,
+
+            EVENT_TO_ANIMATE_BAR,
+            EVENT_TO_HIDE_AD_BAR,
+            EVENT_TO_SHOW_SKIP,
+            EVENT_TO_START_COUNTDOWN,
+            EVENT_NAME_FIRED,
+
     };
 
     @Retention(RetentionPolicy.SOURCE)
@@ -93,6 +108,13 @@ class VideoEventEmitter {
             EVENT_AUDIO_FOCUS_CHANGE,
             EVENT_PLAYBACK_RATE_CHANGE,
             EVENT_BANDWIDTH,
+
+            EVENT_TO_ANIMATE_BAR,
+            EVENT_TO_HIDE_AD_BAR,
+            EVENT_TO_SHOW_SKIP,
+            EVENT_TO_START_COUNTDOWN,
+            EVENT_NAME_FIRED,
+
     })
     @interface VideoEvents {
     }
@@ -128,7 +150,15 @@ class VideoEventEmitter {
 
     private static final String EVENT_PROP_TIMED_METADATA = "metadata";
 
-    private static final String EVENT_PROP_BITRATE = "bitrate";   
+    private static final String EVENT_PROP_BITRATE = "bitrate";  
+
+    private static final String EVENT_PROP_ANIMATE_VALUE = "animateValue";
+    private static final String EVENT_PROP_HIDE_AD_BAR = "isBarHidden";
+    private static final String EVENT_PROP_SHOW_SKIP = "isShowSkip";
+    private static final String EVENT_PROP_START_COUNTDOWN_AT = "startCountdownAt";
+    private static final String EVENT_PROP_SKIP_TO = "skipTo";
+    private static final String EVENT_PROP_DURATION_TIME = "durationTime";
+    private static final String EVENT_PROP_NAME = "eventName"; 
 
 
     void setViewId(int viewId) {
@@ -293,6 +323,45 @@ class VideoEventEmitter {
         map.putBoolean(EVENT_PROP_HAS_AUDIO_FOCUS, hasFocus);
         receiveEvent(EVENT_AUDIO_FOCUS_CHANGE, map);
     }
+
+
+
+    void toUpdateAnimateBar(double value) {
+        WritableMap map = Arguments.createMap();
+        map.putDouble(EVENT_PROP_ANIMATE_VALUE, (double)value);
+        receiveEvent(EVENT_TO_ANIMATE_BAR, map);
+    }
+
+    void toShowAnimateBar(boolean value) {
+        WritableMap map = Arguments.createMap();
+        map.putBoolean(EVENT_PROP_HIDE_AD_BAR, value);
+        receiveEvent(EVENT_TO_HIDE_AD_BAR, map);
+    }
+
+    void toStartCountdown(double value ) {
+        WritableMap map = Arguments.createMap();
+        map.putDouble(EVENT_PROP_START_COUNTDOWN_AT, value);
+        receiveEvent(EVENT_TO_START_COUNTDOWN, map);
+    }
+
+    void onEventFired(String value ) {
+        WritableMap map = Arguments.createMap();
+        map.putString(EVENT_PROP_NAME, value);
+        receiveEvent(EVENT_NAME_FIRED, map);
+    }
+
+    void toShowSkip(boolean value, int skipTo, int duration ) {
+        Log.d("toShowSkip", String.valueOf(value));
+        WritableMap map = Arguments.createMap();
+        map.putBoolean(EVENT_PROP_SHOW_SKIP, value);
+        map.putInt(EVENT_PROP_SKIP_TO, skipTo);
+        map.putInt(EVENT_PROP_DURATION_TIME, duration);
+        receiveEvent(EVENT_TO_SHOW_SKIP, map);
+    }
+
+
+
+
 
     void audioBecomingNoisy() {
         receiveEvent(EVENT_AUDIO_BECOMING_NOISY, null);
