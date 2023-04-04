@@ -36,7 +36,7 @@ dependencies {
     implementation "androidx.annotation:annotation:1.1.0"
     implementation "androidx.core:core:1.1.0"
     implementation "androidx.media:media:1.1.0"
-
+    implementation "cz.msebera.android:httpclient:4.5.8"
     implementation('com.google.android.exoplayer:extension-okhttp:2.13.3') {
         exclude group: 'com.squareup.okhttp3', module: 'okhttp'
     }
