@@ -74,6 +74,7 @@
         "index.ios.js",
         "index.android.js",
         "index.web.js",
-        "nativeCustomManager"
+        "nativeCustomManager",
+        "icons"
     ]
 }
