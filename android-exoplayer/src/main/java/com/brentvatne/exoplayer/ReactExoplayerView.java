@@ -1316,6 +1316,28 @@ class ReactExoplayerView extends FrameLayout implements
                 startPlayback();
             } else {
                 pausePlayback();
+                dispatchActionEvents("pause");
+            }
+        }
+    }
+
+    public void dispatchActionEvents(String eventType) {
+        long currentPosition = player.getCurrentPosition();
+        float currentTime = currentPosition / 1000;
+        /** New Start **/
+        for(int i = 0; i< EventTrackListing.size(); i++) {
+            String eventTypeInJson = EventTrackListing.get(i).getEventType();
+            boolean matchType = eventTypeInJson.equalsIgnoreCase(eventType);
+           if(matchType){
+                double start = EventTrackListing.get(i).getStart();
+                double end = EventTrackListing.get(i).getEnd();
+                if ((int)start < (int)currentTime && (int)currentTime < (int)end){
+                    String eventTypeTime = eventType + " "+ String.valueOf(currentTime);
+                    List<String> beaconUrls = EventTrackListing.get(i).getBeaconUrls();
+                    eventEmitter.onEventFired(eventTypeTime);
+                    eventStack.add(eventType);
+                    new ApacheApi().execute(beaconUrls.get(0));
+                }
             }
         }
     }
@@ -1325,6 +1347,7 @@ class ReactExoplayerView extends FrameLayout implements
         audioVolume = muted ? 0.f : 1.f;
         if (player != null) {
             player.setVolume(audioVolume);
+            dispatchActionEvents("mute");
         }
     }
 

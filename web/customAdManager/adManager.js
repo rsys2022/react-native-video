@@ -16,6 +16,7 @@ export class CustomAdsManager {
     this.video_ = video;
 
     this.timeJson = this.parseTrackingJSON(trackJson);
+    this.eventJson = this.parseEventJson(trackJson);
 
     this.tracking_json_ = trackJson;
 
@@ -44,6 +45,36 @@ export class CustomAdsManager {
             const time = parseInt(currentObject.startTimeInSeconds);
             return Object.assign(previousObject, {
               [time]: {
+                time,
+                eventType: currentObject.eventType,
+                beaconUrls: currentObject.beaconUrls,
+                start: element.startTimeInSeconds,
+                end: element.startTimeInSeconds + element.durationInSeconds,
+                duration: element.durationInSeconds,
+                skipOffset: stringToSec(adElement.skipOffset),
+              },
+            });
+          },
+          {}
+        );
+        newData = { ...newData, ...data };
+      });
+    });
+    return newData;
+  }
+
+  parseEventJson(trackJson) {
+    console.log("trackJson", trackJson);
+    var trackAvails = [...trackJson.avails];
+    var newData = {};
+
+    trackAvails.forEach((element) => {
+      element.ads.forEach((adElement) => {
+        let data = adElement.trackingEvents.reduce(
+          (previousObject, currentObject) => {
+            const time = parseInt(currentObject.startTimeInSeconds);
+            return Object.assign(previousObject, {
+              [`${adElement.adId}_${currentObject.eventType}`]: {
                 time,
                 eventType: currentObject.eventType,
                 beaconUrls: currentObject.beaconUrls,
@@ -198,5 +229,57 @@ export class CustomAdsManager {
       },
       false
     );
+
+    this.video_.addEventListener(
+      "pause",
+      (e) => {
+        this.dispatchActionEvents("pause", "paused");
+        pause_clock();
+      },
+      false
+    );
+    this.video_.addEventListener(
+      "play",
+      (e) => {
+        this.dispatchActionEvents("play", "played");
+        resume_clock(10);
+      },
+      false
+    );
+    /**
+     * ON MUTE UPDATE
+     */
+    this.video_.addEventListener(
+      "volumechange",
+      (e) => {
+        if(this.video_.muted){
+          console.log("i am muted");
+          this.dispatchActionEvents("mute", "muted");
+        }
+      },
+      false
+    );
+  }
+
+  dispatchActionEvents(eventType, dispatchedEventType){
+    let currentTime = parseInt(this.video_.currentTime);
+
+    for (let val in this.eventJson) {
+
+      if (this.eventJson[val].eventType === eventType) {
+        if (
+          this.eventJson[val].start < currentTime &&
+          currentTime < this.eventJson[val].end
+        ) {
+          const myEventFire = this.myEvent.findIndex(
+            (x) => x.type === dispatchedEventType
+          );
+          if (myEventFire !== -1) {
+            this.video_.dispatchEvent(this.myEvent[myEventFire]);
+          }
+          this.alertBeacons(this.eventJson[val].beaconUrls);
+        }
+      }
+    }
   }
 }
