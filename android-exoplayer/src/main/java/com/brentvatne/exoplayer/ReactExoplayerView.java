@@ -166,7 +166,7 @@ class ReactExoplayerView extends FrameLayout implements
 
     private ArrayList<String> eventStack = new ArrayList<>();
     private ArrayList<TrackingEventObj> TrackListing = new ArrayList<>();
-    private ArrayList<EventTrackListing> EventTrackListing = new ArrayList<>();
+    private ArrayList<TrackingActionEventObj> EventTrackListing = new ArrayList<>();
     private ReadableMap trackingJson = null;
     private boolean isAdsPlaying = false;
     private int skipToTimeInMs = 0;
@@ -1326,21 +1326,21 @@ class ReactExoplayerView extends FrameLayout implements
         long currentPosition = player.getCurrentPosition();
         float currentTime = currentPosition / 1000;
         /** New Start **/
-        // for(int i = 0; i< EventTrackListing.size(); i++) {
-        //     String eventTypeInJson = EventTrackListing.get(i).getEventType();
-        //     boolean matchType = eventTypeInJson.equalsIgnoreCase(eventType);
-        //    if(matchType){
-        //         double start = EventTrackListing.get(i).getStart();
-        //         double end = EventTrackListing.get(i).getEnd();
-        //         if ((int)start < (int)currentTime && (int)currentTime < (int)end){
-        //             String eventTypeTime = eventType + " "+ String.valueOf(currentTime);
-        //             List<String> beaconUrls = EventTrackListing.get(i).getBeaconUrls();
-        //             eventEmitter.onEventFired(eventTypeTime);
-        //             eventStack.add(eventType);
-        //             new ApacheApi().execute(beaconUrls.get(0));
-        //         }
-        //     }
-        // }
+        for(int i = 0; i< EventTrackListing.size(); i++) {
+            String eventTypeInJson = EventTrackListing.get(i).getEventType();
+            boolean matchType = eventTypeInJson.equalsIgnoreCase(eventType);
+           if(matchType){
+                double start = EventTrackListing.get(i).getStart();
+                double end = EventTrackListing.get(i).getEnd();
+                if ((int)start < (int)currentTime && (int)currentTime < (int)end){
+                    String eventTypeTime = eventType + " "+ String.valueOf(currentTime);
+                    List<String> beaconUrls = EventTrackListing.get(i).getBeaconUrls();
+                    eventEmitter.onEventFired(eventTypeTime);
+                    eventStack.add(eventType);
+                    new ApacheApi().execute(beaconUrls.get(0));
+                }
+            }
+        }
     }
 
     public void setMutedModifier(boolean muted) {
@@ -1497,7 +1497,6 @@ class ReactExoplayerView extends FrameLayout implements
 
             TrackListing.add(tracks);
         }
-        Log.d("time TrackListing", String.valueOf(TrackListing));
     }
 
     public void setEventTrackingJsonModifier(ReadableMap eventJson){
@@ -1511,9 +1510,33 @@ class ReactExoplayerView extends FrameLayout implements
 
         for(String key : map.keySet()) {
             String[] arr = String.valueOf(map.get(key)).split(",");
-            Log.d("arr tracking", arr[0]);
-            // invoking method
+            String[] beaconArray = String.valueOf(arr[0]).split("=");
+            String[] durationArray = String.valueOf(arr[1]).split("=");
+            String[] eventIdArray = String.valueOf(arr[2]).split("=");
+            String[] startArray = String.valueOf(arr[3]).split("=");
+            String[] endArray = String.valueOf(arr[4]).split("=");
+            String[] timeArray = String.valueOf(arr[5]).split("=");
+            String[] eventTypeArray = String.valueOf(arr[6]).split("=");
+            String[] skipBarcArray = String.valueOf(arr[7]).split("=");
 
+            StringBuffer sb = new StringBuffer(skipBarcArray[1]);
+            sb.deleteCharAt(sb.length()-1);
+            // invoking method
+            String SkipOffsetVal = String.valueOf(sb);
+            String[] arrSplitStartBr = String.valueOf(beaconArray[1]).split("\\[");
+            String[] arrSplitEndBr = String.valueOf(arrSplitStartBr[1]).split("]");
+            TrackingActionEventObj eventTracks = new TrackingActionEventObj();
+
+            eventTracks.setBeaconUrls(Arrays.asList(arrSplitEndBr[0]));
+            eventTracks.setDuration(Double.parseDouble(durationArray[1]));
+            eventTracks.setEventId(eventIdArray[1]);
+            eventTracks.setStart(Double.parseDouble(startArray[1]));
+            eventTracks.setEnd(Double.parseDouble(endArray[1]));
+            eventTracks.setTime(Double.parseDouble(timeArray[1]));
+            eventTracks.setEventType(eventTypeArray[1]);
+            eventTracks.setSkipOffset(Double.parseDouble(SkipOffsetVal));
+
+            EventTrackListing.add(eventTracks);
 
         }
     }
