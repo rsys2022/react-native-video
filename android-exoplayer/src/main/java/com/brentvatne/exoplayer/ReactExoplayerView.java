@@ -166,6 +166,7 @@ class ReactExoplayerView extends FrameLayout implements
 
     private ArrayList<String> eventStack = new ArrayList<>();
     private ArrayList<TrackingEventObj> TrackListing = new ArrayList<>();
+    private ArrayList<EventTrackListing> EventTrackListing = new ArrayList<>I();
     private ReadableMap trackingJson = null;
     private boolean isAdsPlaying = false;
     private int skipToTimeInMs = 0;
@@ -1325,21 +1326,21 @@ class ReactExoplayerView extends FrameLayout implements
         long currentPosition = player.getCurrentPosition();
         float currentTime = currentPosition / 1000;
         /** New Start **/
-        for(int i = 0; i< EventTrackListing.size(); i++) {
-            String eventTypeInJson = EventTrackListing.get(i).getEventType();
-            boolean matchType = eventTypeInJson.equalsIgnoreCase(eventType);
-           if(matchType){
-                double start = EventTrackListing.get(i).getStart();
-                double end = EventTrackListing.get(i).getEnd();
-                if ((int)start < (int)currentTime && (int)currentTime < (int)end){
-                    String eventTypeTime = eventType + " "+ String.valueOf(currentTime);
-                    List<String> beaconUrls = EventTrackListing.get(i).getBeaconUrls();
-                    eventEmitter.onEventFired(eventTypeTime);
-                    eventStack.add(eventType);
-                    new ApacheApi().execute(beaconUrls.get(0));
-                }
-            }
-        }
+        // for(int i = 0; i< EventTrackListing.size(); i++) {
+        //     String eventTypeInJson = EventTrackListing.get(i).getEventType();
+        //     boolean matchType = eventTypeInJson.equalsIgnoreCase(eventType);
+        //    if(matchType){
+        //         double start = EventTrackListing.get(i).getStart();
+        //         double end = EventTrackListing.get(i).getEnd();
+        //         if ((int)start < (int)currentTime && (int)currentTime < (int)end){
+        //             String eventTypeTime = eventType + " "+ String.valueOf(currentTime);
+        //             List<String> beaconUrls = EventTrackListing.get(i).getBeaconUrls();
+        //             eventEmitter.onEventFired(eventTypeTime);
+        //             eventStack.add(eventType);
+        //             new ApacheApi().execute(beaconUrls.get(0));
+        //         }
+        //     }
+        // }
     }
 
     public void setMutedModifier(boolean muted) {

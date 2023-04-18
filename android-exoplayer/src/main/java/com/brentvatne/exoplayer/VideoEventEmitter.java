@@ -351,7 +351,6 @@ class VideoEventEmitter {
     }
 
     void toShowSkip(boolean value, int skipTo, int duration ) {
-        Log.d("toShowSkip", String.valueOf(value));
         WritableMap map = Arguments.createMap();
         map.putBoolean(EVENT_PROP_SHOW_SKIP, value);
         map.putInt(EVENT_PROP_SKIP_TO, skipTo);
