@@ -166,7 +166,7 @@ class ReactExoplayerView extends FrameLayout implements
 
     private ArrayList<String> eventStack = new ArrayList<>();
     private ArrayList<TrackingEventObj> TrackListing = new ArrayList<>();
-    private ArrayList<EventTrackListing> EventTrackListing = new ArrayList<>I();
+    private ArrayList<EventTrackListing> EventTrackListing = new ArrayList<>();
     private ReadableMap trackingJson = null;
     private boolean isAdsPlaying = false;
     private int skipToTimeInMs = 0;
@@ -1500,6 +1500,23 @@ class ReactExoplayerView extends FrameLayout implements
         Log.d("time TrackListing", String.valueOf(TrackListing));
     }
 
+    public void setEventTrackingJsonModifier(ReadableMap eventJson){
+        if(eventJson == null){
+            return;
+
+        }
+        HashMap<String, Object> timeObj= new HashMap(eventJson.toHashMap());
+        Map<String, Object> map = (Map<String, Object>)timeObj;
+
+
+        for(String key : map.keySet()) {
+            String[] arr = String.valueOf(map.get(key)).split(",");
+            Log.d("arr tracking", arr[0]);
+            // invoking method
+
+
+        }
+    }
 
 
     @Override

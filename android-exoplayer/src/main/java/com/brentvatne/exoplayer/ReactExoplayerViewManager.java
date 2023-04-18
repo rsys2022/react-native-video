@@ -73,7 +73,6 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
 
     private static final String PROP_TRACKING_JSON = "trackingJson";
 
-    private static final String PROP_ACTION_TRACKING_JSON = "trackingJson";
     private static final String PROP_EVENT_TRACKING_JSON = "eventTracking";
 
     private ReactExoplayerConfig config;
