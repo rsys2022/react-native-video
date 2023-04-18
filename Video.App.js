@@ -30,6 +30,7 @@ export default class Video extends Component {
       initialCountdown: 0,
       skipTo: null,
       pause: false,
+      mute: false
     };
   }
 
@@ -305,6 +306,37 @@ export default class Video extends Component {
     return newData;
   }
 
+
+  parseEventJson=()=> {
+    var trackAvails = [...this.props.trackingJson.avails];
+    var newData = {};
+
+    trackAvails.forEach((element) => {
+      element.ads.forEach((adElement) => {
+        let data = adElement.trackingEvents.reduce(
+          (previousObject, currentObject) => {
+            const time = parseInt(currentObject.startTimeInSeconds);
+            return Object.assign(previousObject, {
+              [`${adElement.adId}_${currentObject.eventType}`]: {
+                time: currentObject.startTimeInSeconds,
+                eventType: currentObject.eventType,
+                beaconUrls: ["https://randomuser.me/api/"],
+                start: element.startTimeInSeconds,
+                end: element.startTimeInSeconds + element.durationInSeconds,
+                duration: element.durationInSeconds,
+                skipOffset: this.stringToSec(adElement.skipOffset),
+                eventId: `${adElement.adId}_${currentObject.eventType}`
+              },
+            });
+          },
+          {}
+        );
+        newData = { ...newData, ...data };
+      });
+    });
+    return newData;
+  }
+
   _onUpdateAnimateBar = (event) => {
     // this.setState({showBar: event.nativeEvent.isBarHidden})
     this.setState({updateTime: event.nativeEvent.animateValue})
@@ -338,6 +370,8 @@ export default class Video extends Component {
     const shouldCache = !source.__packager_asset;
 
     const trackJson = this.props.trackingJson !== null ? this.parseTrackingJson() : null;
+    const eventJson = this.props.trackingJson !== null ? this.parseEventJson() : null;
+
     let uri = source.uri || '';
     if (uri && uri.match(/^\//)) {
       uri = `file://${uri}`;
@@ -367,6 +401,8 @@ export default class Video extends Component {
     Object.assign(nativeProps, {
       style: [styles.base, nativeProps.style],
       resizeMode: nativeResizeMode,
+      paused: this.props.paused || this.state.pause,
+      muted: this.props.muted || this.state.mute,
       src: {
         uri,
         isNetwork,
@@ -378,6 +414,7 @@ export default class Video extends Component {
         requestHeaders: source.headers ? this.stringsOnlyObject(source.headers) : {},
       },
       trackingJson: trackJson,
+      eventTracking: eventJson,
       onVideoLoadStart: this._onLoadStart,
       onVideoLoad: this._onLoad,
       onVideoError: this._onError,
@@ -432,7 +469,9 @@ export default class Video extends Component {
             onSkipPress={()=> this.seek(this.state.skipTo+1)}
             initialTime={9000}
             playPauseCall={(value)=> this.setState({pause: value})}
+            setMuteValue={(value)=> this.setState({mute: value})}
             isPaused={this.props.paused || this.state.pause}
+            isMuted={this.props.isMuted || this.state.mute}
           />
           }
       </View>

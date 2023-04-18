@@ -4,6 +4,9 @@ import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import useCountDown from './countdown';
 
 
+const muteIcon = require("../icons/mute.png")
+const volumeIcon = require("../icons/volume.png")
+
 function convertTimeTot(totalSeconds) {
   const tSec = parseInt(totalSeconds/1000);
   const minutes = Math.floor(tSec / 60);
@@ -27,7 +30,9 @@ const PercentageBar = ({
   showSkip,
   onSkipPress,
   playPauseCall,
-  isPaused
+  isPaused,
+  isMuted,
+  setMuteValue
 }) => {
   const [getPercentage, setPercentage] = useState(percentage);
   const [getheight, setHeight] = useState(height);
@@ -74,16 +79,40 @@ const PercentageBar = ({
           <Text style={{color: 'white', marginLeft: 10}}>{convertTimeTot(timeLeft)}</Text>
 
           </View>
-        {showSkip &&
-          (
-          <TouchableOpacity style={{backgroundColor: "rgb(0,0,0,0.5)", borderColor: "white", borderWidth: 2, paddingHorizontal: 3}} onPress={()=> {
-            pause();
-            onSkipPress();
-          }}>
-            <Text style={{color: "white"}}>Skip</Text>
-          </TouchableOpacity>
+          <View style={{flexDirection: "row"}}>
+            <TouchableOpacity 
+              style={{
+                backgroundColor: "rgb(0,0,0,0.5)",  
+                paddingHorizontal: 3
+              }} 
+              onPress={()=> {
+                if(isMuted){
+                  setMuteValue(false)
+                }else {
+                  setMuteValue(true)                
+                }
+              }}>
+              <Image source={isMuted ? muteIcon: volumeIcon} style={{width: 20, height: 20}} />
+            </TouchableOpacity>
+            {showSkip &&
+              (
+                <TouchableOpacity 
+                  style={{
+                    backgroundColor: "rgb(0,0,0,0.5)", 
+                    borderColor: "white", 
+                    borderWidth: 2, 
+                    paddingHorizontal: 3
+                  }} 
+                  onPress={()=> {
+                    pause();
+                    onSkipPress();
+                  }}
+                >
+                  <Text style={{color: "white"}}>Skip</Text>
+                </TouchableOpacity>
           )
         }
+        </View>
           
         </View>
                     
