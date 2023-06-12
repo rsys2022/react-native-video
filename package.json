@@ -67,8 +67,7 @@
         "Video.App.js",
         "web",
         "webpack.config.js",
-        "index.ios.js",
-        "index.android.js",
+        "index.js",
         "index.web.js"
     ]
 }
