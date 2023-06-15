@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-// import Video from 'react-native-video';
 import Video from './Video.App';
 import ActionSheet from 'react-native-actions-sheet';
 import {
-	TouchableWithoutFeedback,
 	TouchableHighlight,
 	ImageBackground,
 	PanResponder,
@@ -13,13 +11,10 @@ import {
 	Easing,
 	Image,
 	View,
-	Text,
-	Platform,
+	Text
 } from 'react-native';
 import padStart from 'lodash/padStart';
-import { ImageIcon } from '../../src/component/Icon/icon';
-import { black, blue, gray, transparent } from '../../src/helper/Color';
-import { normalize } from '../../src/helper/FontSize'
+import { ImageIcon,normalize } from './assets/Icon/icon';
 import Modal from 'react-native-modal';
 const lang = ['English', 'Dutch'];
 import ActionSheets from './actionSheet';
@@ -42,7 +37,8 @@ export default class VideoPlayer extends Component {
 		rate: 1,
 		showTimeRemaining: true,
 		showHours: false,
-		control:false
+		control:false,
+		onPlayer:false
 	};
 
 	constructor(props) {
@@ -86,7 +82,8 @@ export default class VideoPlayer extends Component {
 			selectedAudioTrack: undefined,
 			selectedTextTrack: undefined,
 			setTvFocus: true,
-			actionSheet: false
+			actionSheet: false,
+			errorMessage:''
 		};
 
 		/**
@@ -224,8 +221,11 @@ export default class VideoPlayer extends Component {
 	_onLoad(data = {}) {
 		try {
 			let state = this.state;
+			if (this.props.onPlayer) {
 		this.onAudioTracks(data);
 		this.onTextTracks(data);
+			}
+		
 		state.duration = data.duration;
 		state.loading = false;
 		this.setState(state);
@@ -394,8 +394,9 @@ export default class VideoPlayer extends Component {
 	 * @param {object} err  Err obj returned from <Video> component
 	 */
 	_onError(err) {
-		console.log('err---', err)
+		console.log('##err---', err)
 		let state = this.state;
+		state.errorMessage=err?.error?.localizedFailureReason || err?.error?.localizedDescription || 'Video not available'
 		state.error = true;
 		state.loading = false;
 
@@ -1051,7 +1052,7 @@ export default class VideoPlayer extends Component {
 					tiltAngle: 0.05,
 					magnification: 1.55,
 				}}
-				underlayColor={transparent}
+				underlayColor={'transparent'}
 				activeOpacity={0.3}
 				onPress={() => {
 					this.resetControlTimeout();
@@ -1326,7 +1327,7 @@ export default class VideoPlayer extends Component {
 						source={require('../../src/assets/img/error-icon.png')}
 						style={styles.error.icon}
 					/>
-					<Text style={styles.error.text}>Video unavailable</Text>
+					<Text style={styles.error.text}>{this.state.errorMessage}</Text>
 				</View>
 			);
 		}
@@ -1337,7 +1338,6 @@ export default class VideoPlayer extends Component {
 	*  Setting icon on bottom controls
 	*/
 	settingIcon = () => {
-		const { navigation, type } = this.props;
 		return (
 			<TouchableHighlight
 				isTVSelectable={this.state.setTvFocus}
@@ -1348,16 +1348,14 @@ export default class VideoPlayer extends Component {
 					tiltAngle: 0.05,
 					magnification: 1.55,
 				}}
-				// isTVSelectable={true}
-				underlayColor={transparent}
+				underlayColor={'transparent'}
 				onPress={() => {
-					//   this.ActionSheetRef.current?.show();
 					this.setState({ setTvFocus: false, actionSheet: true })
 				}}>
-				<Text style={{ color: gray, fontFamily: 'Montserrat-Medium' }}>
-					<ImageIcon name={'cog'} color={'white'} size={18} /> Settings
+				<Text style={{ color: 'gray', fontFamily: 'Montserrat-Medium' }}>
+					<ImageIcon name={'cog'} color={'white'} size={18} />  Settings
 				</Text>
-			</TouchableHighlight>
+			</TouchableHighlight> 
 		);
 	};
 
@@ -1377,11 +1375,9 @@ export default class VideoPlayer extends Component {
 								// height: 130,
 								width: '50%',
 								paddingTop: 10,
-								// justifyContent:'flex-start',
-								// alignItems: 'flex-start',
 							}}>
 							<View>
-								<Text style={{ color: black, fontFamily: 'Montserrat-Medium', fontSize: normalize(1.5) }}>
+								<Text style={{ color: 'black', fontFamily: 'Montserrat-Medium', fontSize: normalize(1.5) }}>
 									{' '}
 									<ImageIcon size={normalize(1.5)} name={'volume-up'} /> Audio Language
 								</Text>
@@ -1399,14 +1395,14 @@ export default class VideoPlayer extends Component {
 											magnification: 1.15,
 										}}
 										isTVSelectable={!this.state.setTvFocus}
-										underlayColor={transparent}
+										underlayColor={'transparent'}
 										onPress={() => this._onChangeAudio(item)}>
 										<View style={{ flexDirection: 'row', paddingTop: 7 }}>
 											<View style={{ width: 30 }}>
 												{this.state.selectedAudioTrack ? (
 													this.state.selectedAudioTrack.value ===
 														item.language ? (
-														<ImageIcon size={18} color={blue} name={'check'} />
+														<ImageIcon size={18} color={'blue'} name={'check'} />
 													) : null
 												) : null}
 											</View>
@@ -1416,9 +1412,9 @@ export default class VideoPlayer extends Component {
 														color: this.state.selectedAudioTrack
 															? this.state.selectedAudioTrack.value ==
 																item.language
-																? blue
-																: black
-															: black,
+																? 'blue'
+																: 'black'
+															: 'black',
 														fontSize: normalize(1.3)
 													}}>
 													{/* {lang[index]} */}
@@ -1439,7 +1435,7 @@ export default class VideoPlayer extends Component {
 								// justifyContent:'flex-start',
 							}}>
 							<View>
-								<Text style={{ color: black, fontFamily: 'Montserrat-Medium', fontSize: normalize(1.5) }}>
+								<Text style={{ color: 'black', fontFamily: 'Montserrat-Medium', fontSize: normalize(1.5) }}>
 									{' '}
 									<ImageIcon size={normalize(1.5)} name={'commenting'} /> Subtitles
 								</Text>
@@ -1458,14 +1454,14 @@ export default class VideoPlayer extends Component {
 											magnification: 1.15,
 										}}
 										isTVSelectable={!this.state.setTvFocus}
-										underlayColor={transparent}
+										underlayColor={'transparent'}
 										onPress={() => this._onChangeText(item)}>
 										<View style={{ flexDirection: 'row', paddingTop: 7 }}>
 											<View style={{ width: 30 }}>
 												{this.state.selectedTextTrack ? (
 													this.state.selectedTextTrack.value ===
 														item.language ? (
-														<ImageIcon size={18} color={blue} name={'check'} />
+														<ImageIcon size={18} color={'blue'} name={'check'} />
 													) : null
 												) : null}
 											</View>
@@ -1475,9 +1471,9 @@ export default class VideoPlayer extends Component {
 														color: this.state.selectedTextTrack
 															? this.state.selectedTextTrack.value ===
 																item.language
-																? blue
-																: black
-															: black,
+																? 'blue'
+																: 'black'
+															: 'black',
 														fontSize: normalize(1.3)
 													}}>
 													{item.title} {'(' + item.language + ')'}
@@ -1498,14 +1494,14 @@ export default class VideoPlayer extends Component {
 									magnification: 1.15,
 								}}
 								isTVSelectable={!this.state.setTvFocus}
-								underlayColor={transparent}
+								underlayColor={'transparent'}
 								onPress={() => this.onTextTracksOff()}>
 								<View style={{ flexDirection: 'row', paddingTop: 7 }}>
 									<View style={{ width: 30 }}>
 										{this.state.selectedTextTrack ? (
 											this.state.selectedTextTrack.value ===
 												'Off' ? (
-												<ImageIcon size={18} color={blue} name={'check'} />
+												<ImageIcon size={18} color={'blue'} name={'check'} />
 											) : null
 										) : null}
 									</View>
@@ -1515,9 +1511,9 @@ export default class VideoPlayer extends Component {
 												color: this.state.selectedTextTrack
 													? this.state.selectedTextTrack.value ===
 														'Off'
-														? blue
-														: black
-													: black,
+														? 'blue'
+														: 'black'
+													: 'black',
 												fontSize: normalize(1.3)
 											}}>
 											{'(' + 'Off' + ')'}
@@ -1568,7 +1564,6 @@ export default class VideoPlayer extends Component {
 					{this.renderLoader()}
 					{this.props.control && this.renderTopControls()}
 					{this.props.control && this.renderBottomControls()}
-					{/* {this.actionSheet()} */}
 
 					<Modal
 						isVisible={this.state.actionSheet}
