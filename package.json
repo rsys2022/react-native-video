@@ -55,6 +55,7 @@
     "files": [
         "android-exoplayer",
         "android",
+        "assets",
         "actionSheet.js",
         "dom",
         "ios",
