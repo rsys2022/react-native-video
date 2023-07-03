@@ -61,6 +61,7 @@
         "android-exoplayer",
         "android",
         "ios",
+        "assets",
         "windows",
         "FilterType.js",
         "DRMType.js",
@@ -71,8 +72,7 @@
         "Video.App.js",
         "web",
         "webpack.config.js",
-        "index.ios.js",
-        "index.android.js",
+        "index.js",
         "index.web.js",
         "nativeCustomManager",
         "icons"
