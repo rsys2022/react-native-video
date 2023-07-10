@@ -7,7 +7,7 @@ import TextTrackType from './TextTrackType';
 import FilterType from './FilterType';
 import DRMType from './DRMType';
 import VideoResizeMode from './VideoResizeMode.js';
-import PercentageBar from "./nativeCustomManager/progress.js";
+
 const styles = StyleSheet.create({
   base: {
     overflow: 'hidden',
@@ -369,9 +369,6 @@ export default class Video extends Component {
     const source = resolveAssetSource(this.props.source) || {};
     const shouldCache = !source.__packager_asset;
 
-    const trackJson = this.props.trackingJson !== null ? this.parseTrackingJson() : null;
-    const eventJson = this.props.trackingJson !== null ? this.parseEventJson() : null;
-
     let uri = source.uri || '';
     if (uri && uri.match(/^\//)) {
       uri = `file://${uri}`;
@@ -413,8 +410,8 @@ export default class Video extends Component {
         patchVer: source.patchVer || 0,
         requestHeaders: source.headers ? this.stringsOnlyObject(source.headers) : {},
       },
-      trackingJson: trackJson,
-      eventTracking: eventJson,
+      trackingJson: null,
+      eventTracking: null,
       onVideoLoadStart: this._onLoadStart,
       onVideoLoad: this._onLoad,
       onVideoError: this._onError,
@@ -462,7 +459,7 @@ export default class Video extends Component {
         {this.state.showPoster && (
           <Image style={posterStyle} source={{ uri: this.props.poster }} />
         )}
-        {this.state.showBar && 
+        {/* {this.state.showBar && 
           <PercentageBar 
             percentage={`${parseInt((this.state.updateTime*100)+1)}%`} 
             showSkip={this.state.showSkip}
@@ -473,7 +470,7 @@ export default class Video extends Component {
             isPaused={this.props.paused || this.state.pause}
             isMuted={this.props.isMuted || this.state.mute}
           />
-          }
+          } */}
       </View>
     );
   }
