@@ -40,9 +40,7 @@
         "react-native-web": "0.17.7",
         "react-hot-loader": "^4.12.19",
         "react-native-windows": "^0.61.0-0",
-        "shaka-player": "4.2.7",
-        "shaka-player-react": "^1.1.5"
-        
+        "shaka-player": "^4.2.7"
     },
     "dependencies": {
         "deprecated-react-native-prop-types": "^2.2.0",
@@ -50,7 +48,6 @@
         "prop-types": "^15.7.2",
         "react-native-web": "0.17.7",
         "shaka-player": "4.2.7",
-       "shaka-player-react": "^1.1.5",
        "react-dom": "18.1.0",
        "progressbar.js": "^1.1.0"
     },
