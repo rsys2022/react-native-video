@@ -225,7 +225,7 @@
 // 		this.onAudioTracks(data);
 // 		this.onTextTracks(data);
 // 			}
-		
+
 // 		state.duration = data.duration;
 // 		state.loading = false;
 // 		this.setState(state);
@@ -240,7 +240,7 @@
 // 		} catch (error) {
 // 			console.log('Error on Load-')
 // 		}
-		
+
 // 	}
 
 // 	/**
@@ -296,7 +296,7 @@
 // 		// const selectedTrack = data.audioTracks?.find((x: any) => {
 // 		// 	return x.selected;
 // 		// });
-		
+
 
 // 		state.audioTracks = data.audioTracks;
 // 		console.log('audioTracks-------', data.audioTracks);
@@ -354,7 +354,7 @@
 // 	};
 
 // 	onTextTracks = (data) => {
-		
+
 // 		let state = this.state;
 // 		// const selectedTrack = data.textTracks?.find((x: any) => {
 // 		// 	return x.selected;
@@ -1808,10 +1808,6 @@
 
 
 
-
-
-
-
 import React, { Component } from 'react';
 import Video from './Video.App';
 import ActionSheet from 'react-native-actions-sheet';
@@ -1828,11 +1824,11 @@ import {
 	Text
 } from 'react-native';
 import padStart from 'lodash/padStart';
-import { ImageIcon,normalize } from './assets/Icon/icon';
+import { ImageIcon, normalize } from './assets/Icon/icon';
 import Modal from 'react-native-modal';
 const lang = ['English', 'Dutch'];
 import ActionSheets from './nativeCustomManager/actionSheet';
-import PercentageBar from 'react-native-video/nativeCustomManager/progress';
+import { PercentageBar } from 'react-native-video/nativeCustomManager/progress';
 
 export default class VideoPlayer extends Component {
 	static defaultProps = {
@@ -1852,8 +1848,8 @@ export default class VideoPlayer extends Component {
 		rate: 1,
 		showTimeRemaining: true,
 		showHours: false,
-		control:false,
-		onPlayer:false
+		control: false,
+		onPlayer: false
 	};
 
 	constructor(props) {
@@ -1870,7 +1866,7 @@ export default class VideoPlayer extends Component {
 			muted: this.props.muted,
 			volume: this.props.volume,
 			rate: this.props.rate,
-			video_source:this.props.source,
+			video_source: this.props.source,
 			// Controls
 
 			isFullscreen:
@@ -1898,14 +1894,16 @@ export default class VideoPlayer extends Component {
 			selectedTextTrack: undefined,
 			setTvFocus: true,
 			actionSheet: false,
-			errorMessage:'',
- 
+			errorMessage: '',
+			controls: this.props.control,
 			isAdVisible: false,
-		    trackJson: this.props.trackingJson !== null ? this.parseTrackingJson() : null,
+			trackJson: this.props.trackingJson !== null ? this.parseTrackingJson() : null,
+			eventJson: this.props.trackingJson !== null ? this.parseEventJson() : null,
 			showSkip: false,
 			skipTo: 0,
 			adBar: 0,
 			adDuration: 0,
+			eventStack: [],
 		};
 
 		/**
@@ -1960,7 +1958,7 @@ export default class VideoPlayer extends Component {
 			volumeWidth: 150,
 			iconOffset: 0,
 			seekerWidth: 0,
-			ref:Video,
+			ref: Video,
 			scrubbingTimeStep: this.props.scrubbing || 0,
 			tapAnywhereToPause: this.props.tapAnywhereToPause,
 		};
@@ -2012,36 +2010,67 @@ export default class VideoPlayer extends Component {
 
 
 
-	parseTrackingJson=()=> {
+	parseTrackingJson = () => {
 		var trackAvails = [...this.props.trackingJson.avails];
 		var newData = {};
-	
+
 		trackAvails.forEach((element) => {
-		  element.ads.forEach((adElement) => {
-			let data = adElement.trackingEvents.reduce(
-			  (previousObject, currentObject) => {
-				const time = parseInt(currentObject.startTimeInSeconds);
-				return Object.assign(previousObject, {
-				  [time]: {
-					time: currentObject.startTimeInSeconds,
-					eventType: currentObject.eventType,
-					beaconUrls: ["https://randomuser.me/api/"],
-					start: element.startTimeInSeconds,
-					end: element.startTimeInSeconds + element.durationInSeconds,
-					duration: element.durationInSeconds,
-					skipOffset: this.stringToSec(adElement.skipOffset),
-				  },
-				});
-			  },
-			  {}
-			);
-			newData = { ...newData, ...data };
-		  });
+			element.ads.forEach((adElement) => {
+				let data = adElement.trackingEvents.reduce(
+					(previousObject, currentObject) => {
+						const time = parseInt(currentObject.startTimeInSeconds);
+						return Object.assign(previousObject, {
+							[time]: {
+								time: currentObject.startTimeInSeconds,
+								eventType: currentObject.eventType,
+								beaconUrls: ["https://randomuser.me/api/"],
+								start: element.startTimeInSeconds,
+								end: element.startTimeInSeconds + element.durationInSeconds,
+								duration: element.durationInSeconds,
+								skipOffset: this.stringToSec(adElement.skipOffset),
+							},
+						});
+					},
+					{}
+				);
+				newData = { ...newData, ...data };
+			});
 		});
 		return newData;
-	  }
+	}
 
-	  
+	parseEventJson = () => {
+		var trackAvails = [...this.props.trackingJson.avails];
+		var newData = {};
+
+		trackAvails.forEach((element) => {
+			element.ads.forEach((adElement) => {
+				let data = adElement.trackingEvents.reduce(
+					(previousObject, currentObject) => {
+						const time = parseInt(currentObject.startTimeInSeconds);
+						return Object.assign(previousObject, {
+							[`${adElement.adId}_${currentObject.eventType}`]: {
+								time: currentObject.startTimeInSeconds,
+								eventType: currentObject.eventType,
+								beaconUrls: ["https://randomuser.me/api/"],
+								start: element.startTimeInSeconds,
+								end: element.startTimeInSeconds + element.durationInSeconds,
+								duration: element.durationInSeconds,
+								skipOffset: this.stringToSec(adElement.skipOffset),
+								eventId: `${adElement.adId}_${currentObject.eventType}`
+							},
+						});
+					},
+					{}
+				);
+				newData = { ...newData, ...data };
+			});
+		});
+		return newData;
+	}
+
+
+
 	/**
 	  | -------------------------------------------------------
 	  | Events
@@ -2079,86 +2108,113 @@ export default class VideoPlayer extends Component {
 		try {
 			let state = this.state;
 			if (this.props.onPlayer) {
-		this.onAudioTracks(data);
-		this.onTextTracks(data);
+				this.onAudioTracks(data);
+				this.onTextTracks(data);
 			}
-		
-		state.duration = data.duration;
-		state.loading = false;
-		this.setState(state);
 
-		if (state.showControls) {
-			this.setControlTimeout();
-		}
+			state.duration = data.duration;
+			state.loading = false;
+			this.setState(state);
 
-		if (typeof this.props.onLoad === 'function') {
-			this.props.onLoad(...arguments);
-		}
+			if (state.showControls) {
+				this.setControlTimeout();
+			}
+
+			if (typeof this.props.onLoad === 'function') {
+				this.props.onLoad(...arguments);
+			}
 		} catch (error) {
 			console.log('Error on Load-')
 		}
-		
+
 	}
 
 
-		/**
-	 * SHOWING AD UI 
-	 */
+	alertBeacons(urls) {
+		var promises = urls.map((url) => fetch(url, { method: "GET" }));
+		Promise.all(promises)
+			.then((results) => {
+				console.log("results", results);
+				return { response: results, error: {} }
+			})
+			.catch((error) => {
+				return { response: {}, error: error }
+			});
+	}
 
-		stringToSec = (timeString) => {
-			const arr = timeString.split(":");
-			const seconds = arr[0] * 3600 + arr[1] * 60 + +arr[2];
-			return seconds;
-		  };
-		_onProgressAds(data){
-			const timeObj = this.state.trackJson;
-			let state = this.state;
-			// const trackingAvail = [...this.tracking_json_.avails];
-			const currentTime = parseInt(data.currentTime);
-			for (const time in timeObj) 
-			{
+
+
+	/**
+ * SHOWING AD UI 
+ */
+
+	stringToSec = (timeString) => {
+		const arr = timeString.split(":");
+		const seconds = arr[0] * 3600 + arr[1] * 60 + +arr[2];
+		return seconds;
+	};
+
+	_onProgressAds(data) {
+		const timeObj = this.state.trackJson;
+		let state = this.state;
+		// const trackingAvail = [...this.tracking_json_.avails];
+		const currentTime = parseInt(data.currentTime);
+		for (const time in timeObj) {
+			if (
+				timeObj[time].start < currentTime &&
+				currentTime < timeObj[time].end
+			) {
+				// console.log("time" , time,currentTime,  time === currentTime ? "yes" : "")
+				// console.log("time" ,typeof time, typeof currentTime)
+				if (Number(time) === currentTime) {
+					// let eventType = timeObj[time].eventType;
+					// console.log("eventType", eventType)
+					let isIncluded = state.eventStack.includes(timeObj[time].eventType);
+					if (!isIncluded) {
+						state.eventStack = [...state.eventStack, timeObj[time].eventType];
+						const apiResult = this.alertBeacons(timeObj[time].beaconUrls);
+					}
+				}
+
+				state.adDuration = ((parseInt(timeObj[time].duration) + timeObj[time].start) - currentTime)
+				state.adBar = (currentTime - timeObj[time].start) / (timeObj[time].end - timeObj[time].start);
+				// this.setState({ adDuration:  (parseInt(timeObj[time].duration) - currentTime)*1000})
+				if (!this.state.isAdVisible) {
+					// this.setState({isAdVisible: true})
+					state.isAdVisible = true
+					state.controls = false
+					// console.log("timeObj[time].start", timeObj[time].start, this.state.isAdVisible)
+					// adDuration = timeObj[time].start + parseInt(timeObj[time].duration)
+				}
 				if (
-					timeObj[time].start < currentTime &&
-					currentTime < timeObj[time].end
-				  ) {
-					
-						state.adDuration = ((parseInt(timeObj[time].duration) + timeObj[time].start)  - currentTime)
-						state.adBar = (currentTime -  timeObj[time].start) / (timeObj[time].end - timeObj[time].start);
-						// this.setState({ adDuration:  (parseInt(timeObj[time].duration) - currentTime)*1000})
-						if(!this.state.isAdVisible){
-							// this.setState({isAdVisible: true})
-							state.isAdVisible = true
+					parseInt(timeObj[time].start) +
+					parseInt(timeObj[time].skipOffset) ===
+					currentTime
+				) {
 
-							console.log("timeObj[time].start", timeObj[time].start, this.state.isAdVisible)
-							// adDuration = timeObj[time].start + parseInt(timeObj[time].duration)
-						}
-						if (
-							parseInt(timeObj[time].start) +
-							  parseInt(timeObj[time].skipOffset) ===
-							currentTime
-						  ) {
-							
-							const skipTo = timeObj[time].start + timeObj[time].duration;
-							this.currentAdTime = skipTo;
-							state.skipTo = skipTo
-							state.showSkip = true
-						  }
-						
+					const skipTo = timeObj[time].start + timeObj[time].duration;
+					this.currentAdTime = skipTo;
+					state.skipTo = skipTo
+					state.showSkip = true
 				}
-				 if(parseInt(timeObj[time].end) === currentTime){
-					state.isAdVisible = false
-					state.adDuration = 0
-					state.adBar = 0
-					state.skipTo = 0
-					state.showSkip = false
-				}
-				
-				}
-				
-				this.setState(state)
+
 			}
-		
-		
+			if (parseInt(timeObj[time].end) === currentTime) {
+				state.isAdVisible = false
+				state.adDuration = 0
+				state.adBar = 0
+				state.skipTo = 0
+				state.showSkip = false
+				state.eventStack = []
+				state.controls = true
+			}
+
+		}
+
+		this.setState(state)
+	}
+
+
 
 	/**
 	 * For onprogress we fire listeners that
@@ -2211,7 +2267,7 @@ export default class VideoPlayer extends Component {
 		// const selectedTrack = data.audioTracks?.find((x: any) => {
 		// 	return x.selected;
 		// });
-		
+
 
 		state.audioTracks = data.audioTracks;
 		// if (selectedTrack?.language) {
@@ -2231,7 +2287,7 @@ export default class VideoPlayer extends Component {
 	};
 
 	_onChangeAudio = item => {
-		console.log('selectedAudioTrack----------', item.language);
+		// console.log('selectedAudioTrack----------', item.language);
 		this.setState(
 			{
 				selectedAudioTrack: {
@@ -2241,10 +2297,10 @@ export default class VideoPlayer extends Component {
 				setTvFocus: true
 			},
 			() => {
-				console.log(
-					'selectedAudioTrack updated ---',
-					this.state.selectedAudioTrack,
-				);
+				// console.log(
+				// 	'selectedAudioTrack updated ---',
+				// 	this.state.selectedAudioTrack,
+				// );
 			},
 		);
 		// this.ActionSheetRef.current?.hide();
@@ -2268,13 +2324,13 @@ export default class VideoPlayer extends Component {
 	};
 
 	onTextTracks = (data) => {
-		
+
 		let state = this.state;
 		// const selectedTrack = data.textTracks?.find((x: any) => {
 		// 	return x.selected;
 		// });
 		state.textTracks = data.textTracks
-		console.log('Text Data------',data.textTracks)
+		console.log('Text Data------', data.textTracks)
 		state.selectedTextTrack = {
 			type: 'disable',
 			value: 'Off',
@@ -2310,7 +2366,7 @@ export default class VideoPlayer extends Component {
 	_onError(err) {
 		console.log('##err---', err)
 		let state = this.state;
-		state.errorMessage=err?.error?.localizedFailureReason || err?.error?.localizedDescription || 'Video not available'
+		state.errorMessage = err?.error?.localizedFailureReason || err?.error?.localizedDescription || 'Video not available'
 		state.error = true;
 		state.loading = false;
 
@@ -2472,7 +2528,7 @@ export default class VideoPlayer extends Component {
 	 * state then calls the animation.
 	 */
 	_hideControls() {
-		console.log('mounted----', this.mounted, 'showControls----', this.state.showControls)
+		// console.log('mounted----', this.mounted, 'showControls----', this.state.showControls)
 		if (this.mounted) {
 			let state = this.state;
 			state.showControls = false;
@@ -2683,7 +2739,7 @@ export default class VideoPlayer extends Component {
 	 */
 	seekTo(time = 0) {
 		let state = this.state;
-		if(state.isAdVisible){
+		if (state.isAdVisible) {
 			state.isAdVisible = false
 			state.adDuration = 0
 			state.adBar = 0
@@ -3092,7 +3148,7 @@ export default class VideoPlayer extends Component {
 		const timerControl = this.props.disableTimer
 			? this.renderNullControl()
 			: this.renderTimer();
-		const seekbarControl =  this.props.disableSeekbar
+		const seekbarControl = this.props.disableSeekbar
 			? this.renderNullControl()
 			: this.renderSeekbar();
 		const playPauseControl = this.props.disablePlayPause
@@ -3275,7 +3331,7 @@ export default class VideoPlayer extends Component {
 				<Text style={{ color: 'gray', fontFamily: 'Montserrat-Medium' }}>
 					<ImageIcon name={'cog'} color={'white'} size={18} />  Settings
 				</Text>
-			</TouchableHighlight> 
+			</TouchableHighlight>
 		);
 	};
 
@@ -3482,24 +3538,24 @@ export default class VideoPlayer extends Component {
 					/>
 					{this.renderError()}
 					{this.renderLoader()}
-					{this.props.control && this.renderTopControls()}
+					{this.state.controls && this.renderTopControls()}
 					{/* {this.props.control && this.renderBottomControls()} */}
-                    {this.state.isAdVisible ? (
+					{this.state.isAdVisible ? (
 						<PercentageBar
-							percentage={`${parseInt((this.state.adBar*100)+1)}%`} 
+							percentage={`${parseInt((this.state.adBar * 100) + 1)}%`}
 							showSkip={this.state.showSkip}
 							adDuration={this.state.adDuration}
-							onSkipPress={()=> this.seekTo(this.state.skipTo+1)}
+							onSkipPress={() => this.seekTo(this.state.skipTo + 1)}
 							initialTime={9000}
-							playPauseCall={(value)=> this.setState({paused: value})}
-							setMuteValue={(value)=> console.log(value)}
+							playPauseCall={(value) => this.setState({ paused: value })}
+							setMuteValue={(value) => console.log(value)}
 							isPaused={this.props.paused || this.state.paused}
 							isMuted={this.props.isMuted}
 							setTvFocus={this.state.setTvFocus}
 						/>
-						) : 
-						this.props.control && this.renderBottomControls()
-                    }
+					) :
+						this.state.controls && this.renderBottomControls()
+					}
 					<Modal
 						isVisible={this.state.actionSheet}
 						// animationType=

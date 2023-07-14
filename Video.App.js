@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, requireNativeComponent, NativeModules, View, Image, Platform, findNodeHandle } from 'react-native';
-import {ViewPropTypes, ImagePropTypes} from 'deprecated-react-native-prop-types';
+import { ViewPropTypes, ImagePropTypes } from 'deprecated-react-native-prop-types';
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
 import TextTrackType from './TextTrackType';
 import FilterType from './FilterType';
@@ -62,7 +62,7 @@ export default class Video extends Component {
   }
 
   seek = (time, tolerance = 100) => {
-    if (isNaN(time)) {throw new Error('Specified time is not a number');}
+    if (isNaN(time)) { throw new Error('Specified time is not a number'); }
 
     if (Platform.OS === 'ios') {
       this.setNativeProps({
@@ -84,7 +84,7 @@ export default class Video extends Component {
     this.setNativeProps({ fullscreen: false });
   };
 
-  save = async (options?) => {
+  save = async (options) => {
     return await NativeModules.VideoManager.save(options, findNodeHandle(this._root));
   }
 
@@ -277,7 +277,7 @@ export default class Video extends Component {
     return seconds;
   };
 
-  parseTrackingJson=()=> {
+  parseTrackingJson = () => {
     var trackAvails = [...this.props.trackingJson.avails];
     var newData = {};
 
@@ -307,7 +307,7 @@ export default class Video extends Component {
   }
 
 
-  parseEventJson=()=> {
+  parseEventJson = () => {
     var trackAvails = [...this.props.trackingJson.avails];
     var newData = {};
 
@@ -338,27 +338,23 @@ export default class Video extends Component {
   }
 
   _onUpdateAnimateBar = (event) => {
-    // this.setState({showBar: event.nativeEvent.isBarHidden})
-    this.setState({updateTime: event.nativeEvent.animateValue})
-    // console.log("event", event.nativeEvent)
+    this.setState({ updateTime: event.nativeEvent.animateValue })
   }
 
-  _onShowAnimateBar=(event)=>{
-    this.setState({showBar: event.nativeEvent.isBarHidden})
+  _onShowAnimateBar = (event) => {
+    this.setState({ showBar: event.nativeEvent.isBarHidden })
   }
 
-  _onShowSkip=(event) => {
-    // console.log("skipTo",event.nativeEvent.skipTo)
-    this.setState({showSkip: event.nativeEvent.isShowSkip, skipTo: event.nativeEvent.skipTo === 0 ? null: event.nativeEvent.skipTo})
+  _onShowSkip = (event) => {
+    this.setState({ showSkip: event.nativeEvent.isShowSkip, skipTo: event.nativeEvent.skipTo === 0 ? null : event.nativeEvent.skipTo })
   }
 
-  _toStartCountdown= (event) => {
-    // console.log("initialCountdown",event.nativeEvent.startCountdownAt)
-    this.setState({initialCountdown: event.nativeEvent.startCountdownAt * 1000})
+  _toStartCountdown = (event) => {
+    this.setState({ initialCountdown: event.nativeEvent.startCountdownAt * 1000 })
   }
 
-  _onEventFired=(event)=> {
-    console.log("event fired > ",event.nativeEvent.eventName)
+  _onEventFired = (event) => {
+    console.log("event fired > ", event.nativeEvent.eventName)
   }
 
 
@@ -632,7 +628,7 @@ Video.propTypes = {
   translateX: PropTypes.number,
   translateY: PropTypes.number,
   rotation: PropTypes.number,
-  
+
   trackingJson: PropTypes.object,
   ...ViewPropTypes,
 };

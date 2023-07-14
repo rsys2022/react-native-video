@@ -45,12 +45,12 @@
 //   const [totalDuration, setTotalDuration] = useState(90000);
 //   const [timerReset, setTimerReset] = useState(false);
 //   const [timeLeft, { start, pause, resume, reset }] = useCountDown(initialTime, 1000);
-  
+
 //   // start the timer during the first render
 //   React.useEffect(() => {
 //     start();
 //   }, []);
-  
+
 //   const restart = React.useCallback(() => {
 //     // you can start existing timer with an arbitrary value
 //     // if new value is not passed timer will start with initial value
@@ -65,14 +65,14 @@
 //           <TouchableOpacity style={{backgroundColor: "rgb(0,0,0,0.5)", borderColor: "white", borderWidth: 2, paddingHorizontal: 3}} onPress={()=> {
 //             if(isPaused){
 //               playPauseCall(false)
-              
+
 //               resume()
 //             }else {
 //               playPauseCall(true)
 //               pause()
-              
+
 //             }
-            
+
 //           }}>
 //             <Text style={{color: "white"}}>{isPaused? "Play" : "Pause"}</Text>
 //           </TouchableOpacity>
@@ -113,9 +113,9 @@
 //           )
 //         }
 //         </View>
-          
+
 //         </View>
-                    
+
 //         <View style={[styles.barStyle, { width: percentage ? percentage : 0,backgroundColor: getCompletedColor,}]}/>
 //     </View>
 //   );
@@ -126,7 +126,7 @@
 //             height: 5,
 //             // marginVertical: 10,
 //             borderRadius: 5,
-            
+
 //             position: 'absolute',
 //             bottom:20
 //           }
@@ -140,7 +140,7 @@
 
 import React from 'react';
 
-import {StyleSheet, Text, View, Image, TouchableHighlight} from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableHighlight } from 'react-native';
 
 function convertTimeTot(totalSeconds) {
   const tSec = parseInt(totalSeconds);
@@ -155,13 +155,13 @@ function convertTimeTot(totalSeconds) {
 }
 
 
-const PercentageBar = ({
+export const PercentageBar = ({
   navigation,
   percentage = "0%",
-  height=5,
+  height = 5,
   backgroundColor = "white",
-  completedColor="yellow",
-  initialTime=9000,
+  completedColor = "yellow",
+  initialTime = 9000,
   showSkip,
   onSkipPress,
   playPauseCall,
@@ -174,31 +174,31 @@ const PercentageBar = ({
   let source = isPaused ? require('../assets/img/play.png') : require('../assets/img/pause.png')
 
   return (
-    <View style={{position: 'absolute', bottom: 0, left: 0, right: 0}}>
+    <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
       <View style={seekbar.container}>
-          <View style={seekbar.track}>
-            <View
-              style={[
-                seekbar.fill,
-                {
-                  width: percentage,
-                  backgroundColor:  '#FFFF00',
-                },
-              ]}
-            />
-          </View>
+        <View style={seekbar.track}>
           <View
-            style={[seekbar.handle, { left: percentage }]}
-            >
-            <View
-              style={[
-                seekbar.circle,
-                { backgroundColor: '#FFFF00' },
-              ]}
-            />
-          </View>
-			</View>
-      <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+            style={[
+              seekbar.fill,
+              {
+                width: percentage,
+                backgroundColor: '#FFFF00',
+              },
+            ]}
+          />
+        </View>
+        <View
+          style={[seekbar.handle, { left: percentage }]}
+        >
+          <View
+            style={[
+              seekbar.circle,
+              { backgroundColor: '#FFFF00' },
+            ]}
+          />
+        </View>
+      </View>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <TouchableHighlight
           isTVSelectable={setTvFocus}
           tvParallaxProperties={{
@@ -216,8 +216,8 @@ const PercentageBar = ({
           }}
           style={[controls.control]}>
           <Image source={source} />
-			  </TouchableHighlight> 
-        <View style={{flexDirection:"row", justifyContent: "space-between"}}>
+        </TouchableHighlight>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <TouchableHighlight
             isTVSelectable={setTvFocus}
             tvParallaxProperties={{
@@ -235,43 +235,43 @@ const PercentageBar = ({
             style={[controls.control]}
           >
             <Text style={controls.timerText}>{convertTimeTot(adDuration)}</Text>
-          </TouchableHighlight> 
+          </TouchableHighlight>
           {showSkip &&
             <TouchableHighlight
-            isTVSelectable={setTvFocus}
-            tvParallaxProperties={{
-              enabled: true,
-              shiftDistanceX: 1.9,
-              shiftDistanceY: 1.9,
-              tiltAngle: 0.05,
-              magnification: 1.55,
-            }}
-            underlayColor={'transparent'}
-            activeOpacity={0.3}
-            onPress={() => {
-              onSkipPress();
-            }}
-            style={[controls.control]}
-          >
-            <Text style={{color: "white"}}>Skip</Text>
-          </TouchableHighlight> 
+              isTVSelectable={setTvFocus}
+              tvParallaxProperties={{
+                enabled: true,
+                shiftDistanceX: 1.9,
+                shiftDistanceY: 1.9,
+                tiltAngle: 0.05,
+                magnification: 1.55,
+              }}
+              underlayColor={'transparent'}
+              activeOpacity={0.3}
+              onPress={() => {
+                onSkipPress();
+              }}
+              style={[controls.control]}
+            >
+              <Text style={{ color: "white" }}>Skip</Text>
+            </TouchableHighlight>
           }
-          
+
         </View>
-      </View>        
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-    barStyle : {
-            height: 5,
-            // marginVertical: 10,
-            borderRadius: 5,
-            
-            position: 'absolute',
-            bottom:20
-          }
+  barStyle: {
+    height: 5,
+    // marginVertical: 10,
+    borderRadius: 5,
+
+    position: 'absolute',
+    bottom: 20
+  }
 })
 
 const seekbar = StyleSheet.create({
@@ -308,3 +308,93 @@ const seekbar = StyleSheet.create({
     width: 12,
   },
 })
+const controls = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: null,
+    width: null,
+  },
+  column: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: null,
+    width: null,
+  },
+  vignette: {
+    resizeMode: 'stretch',
+  },
+  control: {
+    padding: 16,
+  },
+  text: {
+    backgroundColor: 'transparent',
+    color: '#FFF',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  pullRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  top: {
+    flex: 1,
+    alignItems: 'stretch',
+    justifyContent: 'flex-start',
+  },
+  bottom: {
+    alignItems: 'stretch',
+    flex: 2,
+    justifyContent: 'flex-end',
+  },
+  topControlGroup: {
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    width: null,
+    margin: 12,
+    marginBottom: 18,
+  },
+  bottomControlGroup: {
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginLeft: 12,
+    marginRight: 12,
+    marginBottom: 0,
+  },
+  volume: {
+    flexDirection: 'row',
+  },
+  fullscreen: {
+    flexDirection: 'row',
+  },
+  playPause: {
+    position: 'relative',
+    width: 80,
+    zIndex: 0,
+  },
+  title: {
+    alignItems: 'center',
+    flex: 0.6,
+    flexDirection: 'column',
+    padding: 0,
+  },
+  titleText: {
+    textAlign: 'center',
+  },
+  timer: {
+    width: 80,
+  },
+  timerText: {
+    backgroundColor: 'transparent',
+    color: '#FFF',
+    fontSize: 11,
+    textAlign: 'right',
+  },
+})
+
