@@ -2134,7 +2134,7 @@ export default class VideoPlayer extends Component {
 		var promises = urls.map((url) => fetch(url, { method: "GET" }));
 		Promise.all(promises)
 			.then((results) => {
-				console.log("results", results);
+				// console.log("results", results);
 				return { response: results, error: {} }
 			})
 			.catch((error) => {
@@ -2745,6 +2745,7 @@ export default class VideoPlayer extends Component {
 			state.adBar = 0
 			state.skipTo = 0
 			state.showSkip = false
+			state.controls = true
 		}
 		state.currentTime = time;
 		this.player.ref.seek(time);

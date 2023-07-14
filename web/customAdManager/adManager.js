@@ -1,5 +1,5 @@
 var ProgressBar = require("progressbar.js");
-var { resume_clock, setCountDownTime } = require("./timeUtil");
+var { resume_clock, pause_clock, setCountDownTime } = require("./timeUtil");
 
 const stringToSec = (timeString) => {
   const arr = timeString.split(":");

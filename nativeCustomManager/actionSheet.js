@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native';
-import {ImageIcon,normalize} from  './assets/Icon/icon' 
+import {ImageIcon,normalize} from  '../assets/Icon/icon' 
 const WHITE = '#ffffff';
 const BORDER_COLOR = '#DBDBDB';
 
