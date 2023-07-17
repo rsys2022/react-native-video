@@ -140,7 +140,8 @@ export class CustomAdsManager {
       const skipEl = document.getElementById("skipAd");
       skipEl.style.display = "none";
       this.video_.currentTime = this.currentAdTime;
-      this.video_.controls = true;
+      let videoContainer = document.querySelector(".video-container");
+      videoContainer.setAttribute("shaka-controls", "true");
       this.adContainer_.style.display = "none";
       this.progressContainer_.animate(0);
       this.video_.play();
@@ -180,14 +181,17 @@ export class CustomAdsManager {
           /**
            * SHOW HIDE AD UI
            */
+          let videoContainer = document.querySelector(".video-container");
           if (
             timeObj[time].start < currentTime &&
             currentTime < timeObj[time].end
           ) {
-            if (this.video_.controls) {
-              this.video_.controls = false;
+            if (videoContainer.getAttribute("shaka-controls") == "true") {
+              // this.video_.controls = false;
+              videoContainer.setAttribute("shaka-controls", "false")
+              const barUi = document.getElementById("ad-ui")
+              barUi.style.display = "block";
               //start
-              console.log("this.video paused", this.video_.paused);
               if (this.video_.paused) {
                 setCountDownTime(currentTime - timeObj[time].start);
                 this.video_.play();
@@ -208,19 +212,22 @@ export class CustomAdsManager {
               this.currentAdTime = skipTo;
               const skipEl = document.getElementById("skipAd");
               skipEl.style.display = "block";
+             
             }
             this.adContainer_.style.display = "block";
-
+          
             const animateBar =
               (this.video_.currentTime - timeObj[time].start) /
               (timeObj[time].end - timeObj[time].start);
             this.progressContainer_.animate(animateBar);
           }
           if (parseInt(timeObj[time].end) === parseInt(currentTime)) {
-            if (!this.video_.controls) {
+            if (videoContainer.getAttribute("shaka-controls") == "false") {
               const skipEl = document.getElementById("skipAd");
               skipEl.style.display = "none";
-              this.video_.controls = true;
+              const barUi = document.getElementById("ad-ui")
+              barUi.style.display = "none";
+              videoContainer.setAttribute("shaka-controls", "true");
               this.adContainer_.style.display = "none";
               this.progressContainer_.animate(0);
             }
