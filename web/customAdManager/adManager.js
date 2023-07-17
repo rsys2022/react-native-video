@@ -143,6 +143,10 @@ export class CustomAdsManager {
       let videoContainer = document.querySelector(".video-container");
       videoContainer.setAttribute("shaka-controls", "true");
       this.adContainer_.style.display = "none";
+      const barUi = document.getElementById("ad-ui")
+      if(barUi){
+        barUi.style.display = "none";
+      }
       this.progressContainer_.animate(0);
       this.video_.play();
     }
@@ -186,11 +190,13 @@ export class CustomAdsManager {
             timeObj[time].start < currentTime &&
             currentTime < timeObj[time].end
           ) {
-            if (videoContainer.getAttribute("shaka-controls") == "true") {
+            if (videoContainer && videoContainer.getAttribute("shaka-controls") == "true") {
               // this.video_.controls = false;
               videoContainer.setAttribute("shaka-controls", "false")
               const barUi = document.getElementById("ad-ui")
-              barUi.style.display = "block";
+              if(barUi){
+                barUi.style.display = "block";
+              }
               //start
               if (this.video_.paused) {
                 setCountDownTime(currentTime - timeObj[time].start);
@@ -222,11 +228,13 @@ export class CustomAdsManager {
             this.progressContainer_.animate(animateBar);
           }
           if (parseInt(timeObj[time].end) === parseInt(currentTime)) {
-            if (videoContainer.getAttribute("shaka-controls") == "false") {
+            if (videoContainer && videoContainer.getAttribute("shaka-controls") == "false") {
               const skipEl = document.getElementById("skipAd");
               skipEl.style.display = "none";
               const barUi = document.getElementById("ad-ui")
-              barUi.style.display = "none";
+              if(barUi){
+                barUi.style.display = "none";
+              }
               videoContainer.setAttribute("shaka-controls", "true");
               this.adContainer_.style.display = "none";
               this.progressContainer_.animate(0);
