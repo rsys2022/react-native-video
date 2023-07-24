@@ -2738,18 +2738,30 @@ export default class VideoPlayer extends Component {
 	 * @param {float} time time to seek to in ms
 	 */
 	seekTo(time = 0) {
-		let state = this.state;
-		if (state.isAdVisible) {
-			state.isAdVisible = false
-			state.adDuration = 0
-			state.adBar = 0
-			state.skipTo = 0
-			state.showSkip = false
-			state.controls = true
+		if (this.state.isAdVisible) {
+			this.setState((prevState) => ({
+				...prevState,
+				isAdVisible: false,
+				adDuration :0,
+				adBar :0,
+				skipTo :0,
+				showSkip :false,
+				eventStack :[],
+				controls :true,
+				// currentTime: time
+			}), () => {
+				this.player.ref.seek(time);
+			})
+
+		}else {
+			this.player.ref.seek(time);
+			// this.setState((prevState) => ({
+			// 	...prevState,
+			// 	currentTime: time
+			// }), () => {
+			// 	this.player.ref.seek(time);
+			// })
 		}
-		state.currentTime = time;
-		this.player.ref.seek(time);
-		this.setState(state);
 	}
 
 	/**
@@ -3505,6 +3517,33 @@ export default class VideoPlayer extends Component {
 		);
 	};
 
+
+	toggelNativeAdControls = () => {
+		if(this.state.isAdVisible === true) { 
+		  return (
+			<PercentageBar
+				percentage={`${parseInt((this.state.adBar * 100) + 1)}%`}
+				showSkip={this.state.showSkip}
+				adDuration={this.state.adDuration}
+				onSkipPress={() => {
+					this.seekTo(this.state.skipTo + 1)
+				} }
+				initialTime={9000}
+				playPauseCall={(value) => this.setState({ paused: value })}
+				setMuteValue={(value) => console.log(value)}
+				isPaused={this.props.paused || this.state.paused}
+				isMuted={this.props.isMuted}
+				setTvFocus={this.state.setTvFocus}
+			/>
+		  )
+		 } else if(this.state.controls === true){
+			return this.renderBottomControls()
+		 } else {
+			return null
+		 }
+		
+	}
+
 	/**
 	 * Provide all of our options and render the whole component.
 	 */
@@ -3541,22 +3580,7 @@ export default class VideoPlayer extends Component {
 					{this.renderLoader()}
 					{this.state.controls && this.renderTopControls()}
 					{/* {this.props.control && this.renderBottomControls()} */}
-					{this.state.isAdVisible ? (
-						<PercentageBar
-							percentage={`${parseInt((this.state.adBar * 100) + 1)}%`}
-							showSkip={this.state.showSkip}
-							adDuration={this.state.adDuration}
-							onSkipPress={() => this.seekTo(this.state.skipTo + 1)}
-							initialTime={9000}
-							playPauseCall={(value) => this.setState({ paused: value })}
-							setMuteValue={(value) => console.log(value)}
-							isPaused={this.props.paused || this.state.paused}
-							isMuted={this.props.isMuted}
-							setTvFocus={this.state.setTvFocus}
-						/>
-					) :
-						this.state.controls && this.renderBottomControls()
-					}
+					{this.toggelNativeAdControls()}
 					<Modal
 						isVisible={this.state.actionSheet}
 						// animationType=

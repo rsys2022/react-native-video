@@ -141,6 +141,7 @@
 import React from 'react';
 
 import { StyleSheet, Text, View, Image, TouchableHighlight } from 'react-native';
+import {FocusButton} from '../../react-native-tv-selected-focus';
 
 function convertTimeTot(totalSeconds) {
   const tSec = parseInt(totalSeconds);
@@ -198,8 +199,9 @@ export const PercentageBar = ({
           />
         </View>
       </View>
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <TouchableHighlight
+      <View style={{ flexDirection: "row", justifyContent: "space-between",  margin: 20 }}>
+        <FocusButton
+        hasTVPreferredFocus={true}
           isTVSelectable={setTvFocus}
           tvParallaxProperties={{
             enabled: true,
@@ -210,34 +212,22 @@ export const PercentageBar = ({
           }}
           underlayColor={'transparent'}
           activeOpacity={0.3}
+          onFocus={e => {
+            console.log("e",e )
+          }}
+          // onFocus={()=> console.log("focus")}
           onPress={() => {
             // this.resetControlTimeout();
             playPauseCall(!isPaused)
           }}
-          style={[controls.control]}>
+          style={{marginHorizontal: 15}}>
           <Image source={source} />
-        </TouchableHighlight>
+        </FocusButton>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <TouchableHighlight
-            isTVSelectable={setTvFocus}
-            tvParallaxProperties={{
-              enabled: true,
-              shiftDistanceX: 1.9,
-              shiftDistanceY: 1.9,
-              tiltAngle: 0.05,
-              magnification: 1.55,
-            }}
-            underlayColor={'transparent'}
-            activeOpacity={0.3}
-            onPress={() => {
-              // this.resetControlTimeout();
-            }}
-            style={[controls.control]}
-          >
             <Text style={controls.timerText}>{convertTimeTot(adDuration)}</Text>
-          </TouchableHighlight>
-          {showSkip &&
-            <TouchableHighlight
+          {showSkip ?
+          <View style={{ marginLeft: 10,  alignSelf: "center", alignItems: 'center'}}>
+            <FocusButton
               isTVSelectable={setTvFocus}
               tvParallaxProperties={{
                 enabled: true,
@@ -251,11 +241,15 @@ export const PercentageBar = ({
               onPress={() => {
                 onSkipPress();
               }}
-              style={[controls.control]}
-            >
-              <Text style={{ color: "white" }}>Skip</Text>
-            </TouchableHighlight>
-          }
+              onFocus={e => {
+                console.log("e",e )
+              }}
+              style={{alignSelf: "center",}}
+              >
+                <Text style={{ color: "white" }}>Skip</Text>
+               </FocusButton>
+            </View>
+          : null}
 
         </View>
       </View>
@@ -395,6 +389,7 @@ const controls = StyleSheet.create({
     color: '#FFF',
     fontSize: 11,
     textAlign: 'right',
+    marginLeft: 15
   },
 })
 
