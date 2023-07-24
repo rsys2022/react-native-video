@@ -87,8 +87,8 @@ export default class VideoPlayer extends Component {
 			errorMessage: '',
 			controls: this.props.control,
 			isAdVisible: false,
-			trackJson: this.props.trackingJson && this.props.trackingJson !== null ? this.parseTrackingJson() : null,
-			eventJson: this.props.trackingJson && this.props.trackingJson !== null ? this.parseEventJson() : null,
+			trackJson: this.props.trackingJson && this.props.trackingJson !== null ? this.parseTrackingJson(this.props.trackingJson) : null,
+			eventJson: this.props.trackingJson && this.props.trackingJson !== null ? this.parseEventJson(this.props.trackingJson) : null,
 			showSkip: false,
 			skipTo: 0,
 			adBar: 0,
@@ -220,8 +220,8 @@ export default class VideoPlayer extends Component {
 
 
 
-	parseTrackingJson = () => {
-		var trackAvails = [...this.props.trackingJson.avails];
+	parseTrackingJson = (trackList) => {
+		var trackAvails = [...trackList.avails];
 		var newData = {};
 
 		trackAvails.forEach((element) => {
@@ -233,7 +233,7 @@ export default class VideoPlayer extends Component {
 							[time]: {
 								time: currentObject.startTimeInSeconds,
 								eventType: currentObject.eventType,
-								beaconUrls: ["https://randomuser.me/api/"],
+								beaconUrls: currentObject.beaconUrls,
 								start: element.startTimeInSeconds,
 								end: element.startTimeInSeconds + element.durationInSeconds,
 								duration: element.durationInSeconds,
@@ -249,8 +249,8 @@ export default class VideoPlayer extends Component {
 		return newData;
 	}
 
-	parseEventJson = () => {
-		var trackAvails = [...this.props.trackingJson.avails];
+	parseEventJson = (trackList) => {
+		var trackAvails = [...trackList.avails];
 		var newData = {};
 
 		trackAvails.forEach((element) => {
@@ -262,7 +262,7 @@ export default class VideoPlayer extends Component {
 							[`${adElement.adId}_${currentObject.eventType}`]: {
 								time: currentObject.startTimeInSeconds,
 								eventType: currentObject.eventType,
-								beaconUrls: ["https://randomuser.me/api/"],
+								beaconUrls: currentObject.beaconUrls,
 								start: element.startTimeInSeconds,
 								end: element.startTimeInSeconds + element.durationInSeconds,
 								duration: element.durationInSeconds,
@@ -341,6 +341,9 @@ export default class VideoPlayer extends Component {
 
 
 	alertBeacons(urls) {
+		if(urls[0] === ""){
+			return null
+		}
 		var promises = urls.map((url) => fetch(url, { method: "GET" }));
 		Promise.all(promises)
 			.then((results) => {
@@ -445,7 +448,7 @@ export default class VideoPlayer extends Component {
 
 		if (!state.scrubbing) {
 			this._onProgressAds(data);
-			console.log("seeking ", state.isSeeked, this.state.currentTime, data.currentTime  )
+			// console.log("seeking ", state.isSeeked, this.state.currentTime, data.currentTime  )
 			// state.currentTime = data.currentTime
 			// if(state.seeking){
 			// 	// console.log("seeking ", state.seeking, this.state.currentTime, data.currentTime  )
