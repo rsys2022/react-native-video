@@ -2023,6 +2023,7 @@ export default class VideoPlayer extends Component {
 		}
 		
 	}
+	
 
 
 
@@ -2766,19 +2767,19 @@ export default class VideoPlayer extends Component {
 				showSkip :false,
 				eventStack :[],
 				controls :true,
-				// currentTime: time
+				currentTime: time
 			}), () => {
 				this.player.ref.seek(time);
 			})
 
 		}else {
-			this.player.ref.seek(time);
-			// this.setState((prevState) => ({
-			// 	...prevState,
-			// 	currentTime: time
-			// }), () => {
-			// 	this.player.ref.seek(time);
-			// })
+			// this.player.ref.seek(time);
+			this.setState((prevState) => ({
+				...prevState,
+				currentTime: time
+			}), () => {
+				this.player.ref.seek(time);
+			})
 		}
 	}
 
