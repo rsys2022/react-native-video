@@ -2007,6 +2007,24 @@ export default class VideoPlayer extends Component {
 	};
 
 
+	shouldComponentUpdate = (nextProps, nextState) => {
+		if(this.props.trackingJson !== nextProps.trackingJson){
+			const trackingJson = this.parseTrackingJson(nextProps.trackingJson)
+			const eventJson = this.parseEventJson(nextProps.trackingJson)
+			this.setState({
+				trackJson: trackingJson,
+				eventJson: eventJson
+			})
+			return true
+		}else if(this.state !== nextState) {
+			return true
+		}else {
+			return false
+		}
+		
+	}
+
+
 
 
 
