@@ -1424,7 +1424,7 @@ export default class VideoPlayer extends Component {
 					<SafeAreaView
 						style={[styles.controls.row, styles.controls.bottomControlGroup]}>
 						{playPauseControl}
-                        {(this.state.audioTracks.length || this.state.textTracks.length) && this.settingIcon()}
+                        {(this.state.audioTracks.length || this.state.textTracks.length) ? this.settingIcon() : null}
 						{this.renderTitle()}
 						{timerControl}
 					</SafeAreaView>
