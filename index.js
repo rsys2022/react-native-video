@@ -1424,7 +1424,7 @@ export default class VideoPlayer extends Component {
 					<SafeAreaView
 						style={[styles.controls.row, styles.controls.bottomControlGroup]}>
 						{playPauseControl}
-						{this.settingIcon()}
+                        {(this.state.audioTracks.length || this.state.textTracks.length) && this.settingIcon()}
 						{this.renderTitle()}
 						{timerControl}
 					</SafeAreaView>
@@ -1670,7 +1670,7 @@ export default class VideoPlayer extends Component {
 								</Text>
 							</View>
 
-							{this.state.textTracks.map((item, index) => {
+							{this.state.textTracks.length && this.state.textTracks.map((item, index) => {
 								return (
 									<TouchableHighlight
 										key={index}
