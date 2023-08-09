@@ -1,147 +1,6 @@
-// import React, {useState} from 'react';
-
-// import {StyleSheet, Text, View, TouchableOpacity, Image} from 'react-native';
-// import useCountDown from './countdown';
-
-
-// const muteIcon = require("../icons/mute.png")
-// const volumeIcon = require("../icons/volume.png")
-
-// function convertTimeTot(totalSeconds) {
-//   const tSec = parseInt(totalSeconds/1000);
-//   const minutes = Math.floor(tSec / 60);
-//   const seconds = tSec % 60;
-
-//   function padTo2Digits(num) {
-//     return num.toString().padStart(2, "0");
-//   }
-//   const result = `${padTo2Digits(minutes)}:${padTo2Digits(seconds)}`;
-//   return result;
-// }
-
-
-// const PercentageBar = ({
-//   navigation,
-//   percentage = "0%",
-//   height=5,
-//   backgroundColor = "white",
-//   completedColor="yellow",
-//   initialTime=9000,
-//   showSkip,
-//   onSkipPress,
-//   playPauseCall,
-//   isPaused,
-//   isMuted,
-//   setMuteValue
-// }) => {
-//   const [getPercentage, setPercentage] = useState(percentage);
-//   const [getheight, setHeight] = useState(height);
-//   const [getBackgroundColor, setBackgroundColor] = useState(backgroundColor);
-//   const [getCompletedColor, setCompletedColor] = useState(completedColor);
-
-//   // const [playPause, setPlayPause] = useState(false);
-//   /**Timer state */
-//   const [timerStart, setTimerStart] = useState(false);
-//   const [totalDuration, setTotalDuration] = useState(90000);
-//   const [timerReset, setTimerReset] = useState(false);
-//   const [timeLeft, { start, pause, resume, reset }] = useCountDown(initialTime, 1000);
-
-//   // start the timer during the first render
-//   React.useEffect(() => {
-//     start();
-//   }, []);
-
-//   const restart = React.useCallback(() => {
-//     // you can start existing timer with an arbitrary value
-//     // if new value is not passed timer will start with initial value
-//     const newTime = 42 * 1000;
-//     start(newTime);
-//   }, []);
-
-//   return (
-//     <View style={{position: 'absolute', bottom: 0, left: 0, right: 0}}>
-//         <View style={{justifyContent: "space-between", flexDirection: "row", marginBottom:30}}>
-//           <View style={{flexDirection: "row"}}>
-//           <TouchableOpacity style={{backgroundColor: "rgb(0,0,0,0.5)", borderColor: "white", borderWidth: 2, paddingHorizontal: 3}} onPress={()=> {
-//             if(isPaused){
-//               playPauseCall(false)
-
-//               resume()
-//             }else {
-//               playPauseCall(true)
-//               pause()
-
-//             }
-
-//           }}>
-//             <Text style={{color: "white"}}>{isPaused? "Play" : "Pause"}</Text>
-//           </TouchableOpacity>
-//           <Text style={{color: 'white', marginLeft: 10}}>{convertTimeTot(timeLeft)}</Text>
-
-//           </View>
-//           <View style={{flexDirection: "row"}}>
-//             <TouchableOpacity 
-//               style={{
-//                 backgroundColor: "rgb(0,0,0,0.5)",  
-//                 paddingHorizontal: 3
-//               }} 
-//               onPress={()=> {
-//                 if(isMuted){
-//                   setMuteValue(false)
-//                 }else {
-//                   setMuteValue(true)                
-//                 }
-//               }}>
-//               <Image source={isMuted ? muteIcon: volumeIcon} style={{width: 20, height: 20}} />
-//             </TouchableOpacity>
-//             {showSkip &&
-//               (
-//                 <TouchableOpacity 
-//                   style={{
-//                     backgroundColor: "rgb(0,0,0,0.5)", 
-//                     borderColor: "white", 
-//                     borderWidth: 2, 
-//                     paddingHorizontal: 3
-//                   }} 
-//                   onPress={()=> {
-//                     pause();
-//                     onSkipPress();
-//                   }}
-//                 >
-//                   <Text style={{color: "white"}}>Skip</Text>
-//                 </TouchableOpacity>
-//           )
-//         }
-//         </View>
-
-//         </View>
-
-//         <View style={[styles.barStyle, { width: percentage ? percentage : 0,backgroundColor: getCompletedColor,}]}/>
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//     barStyle : {
-//             height: 5,
-//             // marginVertical: 10,
-//             borderRadius: 5,
-
-//             position: 'absolute',
-//             bottom:20
-//           }
-// })
-
-
-// export default PercentageBar;
-
-
-
-
 import React from 'react';
-
-import { StyleSheet, Text, View, Image, TouchableHighlight } from 'react-native';
-import {FocusButton} from '../../react-native-tv-selected-focus';
+import { StyleSheet, Text, View, Image, SafeAreaView } from 'react-native';
+import { FocusButton } from 'node_modules/react-native-tv-selected-focus';
 
 function convertTimeTot(totalSeconds) {
   const tSec = parseInt(totalSeconds);
@@ -199,9 +58,9 @@ export const PercentageBar = ({
           />
         </View>
       </View>
-      <View style={{ flexDirection: "row", justifyContent: "space-between",  margin: 20 }}>
+      <SafeAreaView style={[controls.row, controls.bottomControlGroup]}>
         <FocusButton
-        hasTVPreferredFocus={true}
+          hasTVPreferredFocus={true}
           isTVSelectable={setTvFocus}
           tvParallaxProperties={{
             enabled: true,
@@ -212,21 +71,16 @@ export const PercentageBar = ({
           }}
           underlayColor={'transparent'}
           activeOpacity={0.3}
-          onFocus={e => {
-            console.log("e",e )
-          }}
-          // onFocus={()=> console.log("focus")}
           onPress={() => {
             // this.resetControlTimeout();
             playPauseCall(!isPaused)
           }}
-          style={{marginHorizontal: 15}}>
+          style={[controls.control, controls.playPause]}>
           <Image source={source} />
         </FocusButton>
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            <Text style={controls.timerText}>{convertTimeTot(adDuration)}</Text>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", ...controls.control }}>
+          <Text style={controls.timerText}>{convertTimeTot(adDuration)}</Text>
           {showSkip ?
-          <View style={{ marginLeft: 10,  alignSelf: "center", alignItems: 'center'}}>
             <FocusButton
               isTVSelectable={setTvFocus}
               tvParallaxProperties={{
@@ -241,18 +95,13 @@ export const PercentageBar = ({
               onPress={() => {
                 onSkipPress();
               }}
-              onFocus={e => {
-                console.log("e",e )
-              }}
-              style={{alignSelf: "center",}}
-              >
-                <Text style={{ color: "white" }}>Skip</Text>
-               </FocusButton>
-            </View>
-          : null}
-
+              style={{ marginLeft: 15 }}
+            >
+              <Text style={{ color: "white" }}>Skip</Text>
+            </FocusButton>
+            : null}
         </View>
-      </View>
+      </SafeAreaView>
     </View>
   );
 };
@@ -389,7 +238,7 @@ const controls = StyleSheet.create({
     color: '#FFF',
     fontSize: 11,
     textAlign: 'right',
-    marginLeft: 15
+    marginLeft: 15,
   },
 })
 

@@ -14,12 +14,12 @@ import {
 	Text
 } from 'react-native';
 import padStart from 'lodash/padStart';
-import { ImageIcon, normalize } from './assets/Icon/icon';
+import { ImageIcon, normalize,checkArrayAndElements, filterAndRemoveDuplicates } from './assets/Icon/icon';
 import Modal from 'react-native-modal';
 const lang = ['English', 'Dutch'];
 import ActionSheets from './nativeCustomManager/actionSheet';
 import { PercentageBar } from 'react-native-video/nativeCustomManager/progress';
-
+import { FocusButton } from 'react-native-tv-selected-focus'; 
 export default class VideoPlayer extends Component {
 	static defaultProps = {
 		toggleResizeModeOnFullscreen: true,
@@ -87,8 +87,8 @@ export default class VideoPlayer extends Component {
 			errorMessage: '',
 			controls: this.props.control,
 			isAdVisible: false,
-			trackJson: this.props.trackingJson && this.props.trackingJson !== null ? this.parseTrackingJson(this.props.trackingJson) : null,
-			eventJson: this.props.trackingJson && this.props.trackingJson !== null ? this.parseEventJson(this.props.trackingJson) : null,
+			trackJson: this.props.trackingJson  ? this.parseTrackingJson(this.props.trackingJson) : null,
+			eventJson: this.props.trackingJson  ? this.parseEventJson(this.props.trackingJson) : null,
 			showSkip: false,
 			skipTo: 0,
 			adBar: 0,
@@ -233,7 +233,7 @@ export default class VideoPlayer extends Component {
 							[time]: {
 								time: currentObject.startTimeInSeconds,
 								eventType: currentObject.eventType,
-								beaconUrls: currentObject.beaconUrls,
+								beaconUrls:  currentObject.beaconUrls,
 								start: element.startTimeInSeconds,
 								end: element.startTimeInSeconds + element.durationInSeconds,
 								duration: element.durationInSeconds,
@@ -368,6 +368,10 @@ export default class VideoPlayer extends Component {
 	};
 
 	_onProgressAds(data) {
+		// console.log("his.state.trackJson",this.state.trackJson)
+		if(this.state.trackJson === null){
+			return;
+		}
 		const timeObj = this.state.trackJson;
 		let state = this.state;
 		// const trackingAvail = [...this.tracking_json_.avails];
@@ -498,8 +502,9 @@ export default class VideoPlayer extends Component {
 		// 	return x.selected;
 		// });
 
+		console.log('--audioTracks-------', data.audioTracks);
 
-		state.audioTracks = data.audioTracks;
+		state.audioTracks = filterAndRemoveDuplicates(data.audioTracks,'language');
 		// if (selectedTrack?.language) {
 		// 	this.setState({
 		// 		selectedAudioTrack: {
@@ -507,13 +512,13 @@ export default class VideoPlayer extends Component {
 		// 			value: selectedTrack?.language,
 		// 		},
 		// 	});
-		// 	state.selectedAudioTrack = {
-		// 		type: 'language',
-		// 		value: selectedTrack?.language,
-		// 	}
+			state.selectedAudioTrack = {
+				type: 'language',
+				value: state.audioTracks[0]?.language,
+			}
 		// }
 		this.setState(state);
-		// console.log(state.audioTracks,'--audioTracks-------', data.audioTracks);
+		console.log(state.audioTracks,'--audioTracks-------', data.audioTracks);
 	};
 
 	_onChangeAudio = item => {
@@ -559,7 +564,7 @@ export default class VideoPlayer extends Component {
 		// const selectedTrack = data.textTracks?.find((x: any) => {
 		// 	return x.selected;
 		// });
-		state.textTracks = data.textTracks
+		state.textTracks =  filterAndRemoveDuplicates(data.textTracks,'language');
 		console.log('Text Data------', data.textTracks)
 		state.selectedTextTrack = {
 			type: 'disable',
@@ -572,7 +577,7 @@ export default class VideoPlayer extends Component {
 	onTextTracksOff = () => {
 		let state = this.state;
 		state.selectedTextTrack = {
-			type: 'disable',
+			type: 'disabled',
 			value: 'Off',
 		}
 		this.setState(state);
@@ -1271,10 +1276,12 @@ export default class VideoPlayer extends Component {
 	 * consistent <TouchableHighlight>
 	 * wrapper and styling.
 	 */
-	renderControl(children, callback, style = {}) {
+	renderControl(children, callback, style = {}, name = "") {
+		
 		return (
-			<TouchableHighlight
-				isTVSelectable={this.state.setTvFocus}
+			<FocusButton
+				hasTVPreferredFocus={this.state.actionSheet ? false : name === "play"}
+				isTVSelectable={this.state.actionSheet ? false : this.state.setTvFocus}
 				tvParallaxProperties={{
 					enabled: true,
 					shiftDistanceX: 1.9,
@@ -1283,14 +1290,16 @@ export default class VideoPlayer extends Component {
 					magnification: 1.55,
 				}}
 				underlayColor={'transparent'}
-				activeOpacity={0.3}
+				// activeOpacity={0.3}
+				onFocus={()=>{}}
 				onPress={() => {
 					this.resetControlTimeout();
 					callback();
 				}}
+				button={true}
 				style={[styles.controls.control, style]}>
 				{children}
-			</TouchableHighlight>
+			</FocusButton>
 		);
 	}
 
@@ -1423,8 +1432,8 @@ export default class VideoPlayer extends Component {
 					{seekbarControl}
 					<SafeAreaView
 						style={[styles.controls.row, styles.controls.bottomControlGroup]}>
-						{playPauseControl}
-                        {(this.state.audioTracks.length || this.state.textTracks.length) ? this.settingIcon() : null}
+						{this.state.showControls ? playPauseControl : (<View style={{width:40}}></View>)}
+						{(checkArrayAndElements(this.state.audioTracks) || checkArrayAndElements(this.state.textTracks)) ? this.settingIcon():null}
 						{this.renderTitle()}
 						{timerControl}
 					</SafeAreaView>
@@ -1486,6 +1495,7 @@ export default class VideoPlayer extends Component {
 			<Image source={source} />,
 			this.methods.togglePlayPause,
 			styles.controls.playPause,
+			"play"
 		);
 	}
 
@@ -1568,7 +1578,7 @@ export default class VideoPlayer extends Component {
 	*/
 	settingIcon = () => {
 		return (
-			<TouchableHighlight
+			<FocusButton
 				isTVSelectable={this.state.setTvFocus}
 				tvParallaxProperties={{
 					enabled: true,
@@ -1578,182 +1588,14 @@ export default class VideoPlayer extends Component {
 					magnification: 1.55,
 				}}
 				underlayColor={'transparent'}
+				// onFocus={()=>{}}
 				onPress={() => {
 					this.setState({ setTvFocus: false, actionSheet: true })
 				}}>
-				<Text style={{ color: 'gray', fontFamily: 'Montserrat-Medium' }}>
+				<Text style={{ color: 'white', fontFamily: 'Montserrat-Medium' }}>
 					<ImageIcon name={'cog'} color={'white'} size={18} />  Settings
 				</Text>
-			</TouchableHighlight>
-		);
-	};
-
-	/**
-   * Action sheet
-   */
-
-	actionSheet = () => {
-		return (
-			<ActionSheet ref={this.ActionSheetRef} height={0}>
-				<View style={{ paddingHorizontal: '2%' }}>
-					<View style={{ flexDirection: 'row' }}>
-						<View
-							style={{
-								borderRightWidth: 0.5,
-								borderRightColor: 'gray',
-								// height: 130,
-								width: '50%',
-								paddingTop: 10,
-							}}>
-							<View>
-								<Text style={{ color: 'black', fontFamily: 'Montserrat-Medium', fontSize: normalize(1.5) }}>
-									{' '}
-									<ImageIcon size={normalize(1.5)} name={'volume-up'} /> Audio Language
-								</Text>
-							</View>
-							{this.state.audioTracks.length && this.state.audioTracks.map((item, index) => {
-								return (
-									<TouchableHighlight
-										key={index}
-										// hasTVPreferredFocus={true}
-										tvParallaxProperties={{
-											enabled: true,
-											shiftDistanceX: 1.9,
-											shiftDistanceY: 1.9,
-											tiltAngle: 0.05,
-											magnification: 1.15,
-										}}
-										isTVSelectable={!this.state.setTvFocus}
-										underlayColor={'transparent'}
-										onPress={() => this._onChangeAudio(item)}>
-										<View style={{ flexDirection: 'row', paddingTop: 7 }}>
-											<View style={{ width: 30 }}>
-												{this.state.selectedAudioTrack ? (
-													this.state.selectedAudioTrack.value ===
-														item.language ? (
-														<ImageIcon size={18} color={'blue'} name={'check'} />
-													) : null
-												) : null}
-											</View>
-											<View>
-												<Text
-													style={{
-														color: this.state.selectedAudioTrack
-															? this.state.selectedAudioTrack.value ==
-																item.language
-																? 'blue'
-																: 'black'
-															: 'black',
-														fontSize: normalize(1.3)
-													}}>
-													{/* {lang[index]} */}
-													{item.language}
-												</Text>
-											</View>
-										</View>
-									</TouchableHighlight>
-								);
-							})}
-						</View>
-						<View
-							style={{
-								// height: 150,
-								width: '50%',
-								paddingTop: 10,
-								paddingLeft: 15,
-								// justifyContent:'flex-start',
-							}}>
-							<View>
-								<Text style={{ color: 'black', fontFamily: 'Montserrat-Medium', fontSize: normalize(1.5) }}>
-									{' '}
-									<ImageIcon size={normalize(1.5)} name={'commenting'} /> Subtitles
-								</Text>
-							</View>
-
-							{this.state.textTracks.length && this.state.textTracks.map((item, index) => {
-								return (
-									<TouchableHighlight
-										key={index}
-										// hasTVPreferredFocus={true}
-										tvParallaxProperties={{
-											enabled: true,
-											shiftDistanceX: 1.9,
-											shiftDistanceY: 1.9,
-											tiltAngle: 0.05,
-											magnification: 1.15,
-										}}
-										isTVSelectable={!this.state.setTvFocus}
-										underlayColor={'transparent'}
-										onPress={() => this._onChangeText(item)}>
-										<View style={{ flexDirection: 'row', paddingTop: 7 }}>
-											<View style={{ width: 30 }}>
-												{this.state.selectedTextTrack ? (
-													this.state.selectedTextTrack.value ===
-														item.language ? (
-														<ImageIcon size={18} color={'blue'} name={'check'} />
-													) : null
-												) : null}
-											</View>
-											<View>
-												<Text
-													style={{
-														color: this.state.selectedTextTrack
-															? this.state.selectedTextTrack.value ===
-																item.language
-																? 'blue'
-																: 'black'
-															: 'black',
-														fontSize: normalize(1.3)
-													}}>
-													{item.title} {'(' + item.language + ')'}
-												</Text>
-											</View>
-										</View>
-									</TouchableHighlight>
-								);
-							})}
-							<TouchableHighlight
-								// key={index}
-								// hasTVPreferredFocus={true}
-								tvParallaxProperties={{
-									enabled: true,
-									shiftDistanceX: 1.9,
-									shiftDistanceY: 1.9,
-									tiltAngle: 0.05,
-									magnification: 1.15,
-								}}
-								isTVSelectable={!this.state.setTvFocus}
-								underlayColor={'transparent'}
-								onPress={() => this.onTextTracksOff()}>
-								<View style={{ flexDirection: 'row', paddingTop: 7 }}>
-									<View style={{ width: 30 }}>
-										{this.state.selectedTextTrack ? (
-											this.state.selectedTextTrack.value ===
-												'Off' ? (
-												<ImageIcon size={18} color={'blue'} name={'check'} />
-											) : null
-										) : null}
-									</View>
-									<View>
-										<Text
-											style={{
-												color: this.state.selectedTextTrack
-													? this.state.selectedTextTrack.value ===
-														'Off'
-														? 'blue'
-														: 'black'
-													: 'black',
-												fontSize: normalize(1.3)
-											}}>
-											{'(' + 'Off' + ')'}
-										</Text>
-									</View>
-								</View>
-							</TouchableHighlight>
-						</View>
-					</View>
-				</View>
-			</ActionSheet>
+			</FocusButton>
 		);
 	};
 
@@ -1773,7 +1615,7 @@ export default class VideoPlayer extends Component {
 				setMuteValue={(value) => console.log(value)}
 				isPaused={this.props.paused || this.state.paused}
 				isMuted={this.props.isMuted}
-				setTvFocus={this.state.setTvFocus}
+				setTvFocus={true}
 			/>
 		  )
 		 } else if(this.state.controls === true){
@@ -1788,10 +1630,17 @@ export default class VideoPlayer extends Component {
 	 * Provide all of our options and render the whole component.
 	 */
 	render() {
+		// console.log('this.state.showControls', this.state.showControls)
 		return (
 			<TouchableHighlight
-				// hasTVPreferredFocus={!this.state.showControls}
-				isTVSelectable={!this.state.showControls}
+			// hasTVPreferredFocus={this.state.showControls ? false : this.state.actionSheet ? false : true}
+
+			// isTVSelectable={this.state.showControls ? false : this.state.actionSheet ? false : true}
+			hasTVPreferredFocus={this.state.showControls ? false : this.state.actionSheet ?  false : this.state.isAdVisible ? false  : true}
+
+ 
+
+            isTVSelectable={this.state.showControls ? false : this.state.actionSheet ?  false : this.state.isAdVisible ? false  : true}
 				onPress={this.events.onScreenTouch}
 				style={[styles.player.container, this.styles.containerStyle]}>
 				<View style={[styles.player.container, this.styles.containerStyle]}>
@@ -1817,7 +1666,7 @@ export default class VideoPlayer extends Component {
 						source={this.state.video_source}
 					/>
 					{this.renderError()}
-					{this.renderLoader()}
+					{this.props.control?this.renderLoader():null}
 					{this.state.controls && this.renderTopControls()}
 					{/* {this.props.control && this.renderBottomControls()} */}
 					{this.toggelNativeAdControls()}
@@ -1831,21 +1680,48 @@ export default class VideoPlayer extends Component {
 							justifyContent: 'flex-end'
 						}}
 					>
-						<TouchableHighlight style={{
+						<TouchableHighlight
+						hasTVPreferredFocus={false}
+						isTVSelectable={false}
+						 style={{
 							margin: 0,
 							justifyContent: 'flex-end',
 							flex: 1
 						}} onPress={() => this.setState({ actionSheet: false })}>
-							<ActionSheets
-								audioTracks={this.state.audioTracks}
-								textTracks={this.state.textTracks}
-								selectedTextTrack={this.state.selectedTextTrack}
-								selectedAudioTrack={this.state.selectedAudioTrack}
-								onAudioTracksChange={(item) => this._onChangeAudio(item)}
-								onTextTracksChange={(item) => this._onChangeText(item)}
-								onCancel={() => this.setState({ actionSheet: false })}
-								onTextTracksOff={() => this.onTextTracksOff()}
-							/>
+							{
+
+this.state.actionSheet ?
+
+	(<ActionSheets
+
+	audioTracks={this.state.audioTracks}
+
+	textTracks={this.state.textTracks}
+
+	selectedTextTrack={this.state.selectedTextTrack}
+
+	selectedAudioTrack={this.state.selectedAudioTrack}
+
+	onAudioTracksChange={(item) => this._onChangeAudio(item)}
+
+	onTextTracksChange={(item) => this._onChangeText(item)}
+
+	onCancel={() => this.setState({ actionSheet: false, setTvFocus: true }, ()=> {
+
+		console.log("this.state.showControls >>>> ", this.state.showControls, this.state.actionSheet)
+
+	})}
+
+	onTextTracksOff={() => this.onTextTracksOff()}
+
+/>)
+
+:
+
+(<View /> )
+
+}
+							
 						</TouchableHighlight>
 					</Modal>
 				</View>
@@ -1992,7 +1868,7 @@ const styles = {
 		timerText: {
 			backgroundColor: 'transparent',
 			color: '#FFF',
-			fontSize: 11,
+			fontSize: 14,
 			textAlign: 'right',
 		},
 	}),
