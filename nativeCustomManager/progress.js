@@ -16,18 +16,11 @@ function convertTimeTot(totalSeconds) {
 
 
 export const PercentageBar = ({
-  navigation,
   percentage = "0%",
-  height = 5,
-  backgroundColor = "white",
-  completedColor = "yellow",
-  initialTime = 9000,
   showSkip,
   onSkipPress,
   playPauseCall,
   isPaused,
-  isMuted,
-  setMuteValue,
   adDuration,
   setTvFocus
 }) => {
