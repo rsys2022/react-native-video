@@ -1335,7 +1335,7 @@ export default class VideoPlayer extends Component {
 					},
 				]}>
 				<ImageBackground
-					source={require('../../src/assets/img/top-vignette.png')}
+					source={require('./assets/img/top-vignette.png')}
 					style={[styles.controls.column]}
 					imageStyle={[styles.controls.vignette]}>
 					<SafeAreaView style={styles.controls.topControlGroup}>
@@ -1356,7 +1356,7 @@ export default class VideoPlayer extends Component {
 	renderBack() {
 		return this.renderControl(
 			<Image
-				source={require('../../src/assets/img/back.png')}
+				source={require('./assets/img/back.png')}
 				style={styles.controls.back}
 			/>,
 			this.events.onBack,
@@ -1381,7 +1381,7 @@ export default class VideoPlayer extends Component {
 					{...this.player.volumePanResponder.panHandlers}>
 					<Image
 						style={styles.volume.icon}
-						source={require('../../src/assets/img/volume.png')}
+						source={require('./assets/img/volume.png')}
 					/>
 				</View>
 			</View>
@@ -1394,8 +1394,8 @@ export default class VideoPlayer extends Component {
 	renderFullscreen() {
 		let source =
 			this.state.isFullscreen === true
-				? require('../../src/assets/img/shrink.png')
-				: require('../../src/assets/img/expand.png');
+				? require('./assets/img/shrink.png')
+				: require('./assets/img/expand.png');
 		return this.renderControl(
 			<Image source={source} />,
 			this.methods.toggleFullscreen,
@@ -1426,7 +1426,7 @@ export default class VideoPlayer extends Component {
 					},
 				]}>
 				<ImageBackground
-					source={require('../../src/assets/img/bottom-vignette.png')}
+					source={require('./assets/img/bottom-vignette.png')}
 					style={[styles.controls.column]}
 					imageStyle={[styles.controls.vignette]}>
 					{seekbarControl}
@@ -1489,8 +1489,8 @@ export default class VideoPlayer extends Component {
 	renderPlayPause() {
 		let source =
 			this.state.paused === true
-				? require('../../src/assets/img/play.png')
-				: require('../../src/assets/img/pause.png');
+				? require('./assets/img/play.png')
+				: require('./assets/img/pause.png');
 		return this.renderControl(
 			<Image source={source} />,
 			this.methods.togglePlayPause,
@@ -1537,7 +1537,7 @@ export default class VideoPlayer extends Component {
 			return (
 				<View style={styles.loader.container}>
 					<Animated.Image
-						source={require('../../src/assets/img/loader-icon.png')}
+						source={require('./assets/img/loader-icon.png')}
 						style={[
 							styles.loader.icon,
 							{
@@ -1563,7 +1563,7 @@ export default class VideoPlayer extends Component {
 			return (
 				<View style={styles.error.container}>
 					<Image
-						source={require('../../src/assets/img/error-icon.png')}
+						source={require('./assets/img/error-icon.png')}
 						style={styles.error.icon}
 					/>
 					<Text style={styles.error.text}>{this.state.errorMessage}</Text>
