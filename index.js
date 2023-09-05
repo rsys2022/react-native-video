@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Video from './Video.App';
-import ActionSheet from 'react-native-actions-sheet';
 import {
 	TouchableHighlight,
 	ImageBackground,
@@ -16,10 +15,11 @@ import {
 import padStart from 'lodash/padStart';
 import { ImageIcon, normalize,checkArrayAndElements, filterAndRemoveDuplicates } from './assets/Icon/icon';
 import Modal from 'react-native-modal';
-const lang = ['English', 'Dutch'];
 import ActionSheets from './nativeCustomManager/actionSheet';
 import { PercentageBar } from 'react-native-video/nativeCustomManager/progress';
 import { FocusButton } from 'react-native-tv-selected-focus'; 
+
+
 export default class VideoPlayer extends Component {
 	static defaultProps = {
 		toggleResizeModeOnFullscreen: true,
@@ -1335,7 +1335,7 @@ export default class VideoPlayer extends Component {
 					},
 				]}>
 				<ImageBackground
-					source={require('../../src/assets/img/top-vignette.png')}
+					source={require('../../src/assets/images/icons/top-vignette.png')}
 					style={[styles.controls.column]}
 					imageStyle={[styles.controls.vignette]}>
 					<SafeAreaView style={styles.controls.topControlGroup}>
@@ -1356,7 +1356,7 @@ export default class VideoPlayer extends Component {
 	renderBack() {
 		return this.renderControl(
 			<Image
-				source={require('../../src/assets/img/back.png')}
+				source={require('../../src/assets/images/icons/back.png')}
 				style={styles.controls.back}
 			/>,
 			this.events.onBack,
@@ -1381,7 +1381,7 @@ export default class VideoPlayer extends Component {
 					{...this.player.volumePanResponder.panHandlers}>
 					<Image
 						style={styles.volume.icon}
-						source={require('../../src/assets/img/volume.png')}
+						source={require('../../src/assets/images/icons/volume.png')}
 					/>
 				</View>
 			</View>
@@ -1394,8 +1394,8 @@ export default class VideoPlayer extends Component {
 	renderFullscreen() {
 		let source =
 			this.state.isFullscreen === true
-				? require('../../src/assets/img/shrink.png')
-				: require('../../src/assets/img/expand.png');
+				? require('../../src/assets/images/icons/shrink.png')
+				: require('../../src/assets/images/icons/expand.png');
 		return this.renderControl(
 			<Image source={source} />,
 			this.methods.toggleFullscreen,
@@ -1426,7 +1426,7 @@ export default class VideoPlayer extends Component {
 					},
 				]}>
 				<ImageBackground
-					source={require('../../src/assets/img/bottom-vignette.png')}
+					source={require('../../src/assets/images/icons/bottom-vignette.png')}
 					style={[styles.controls.column]}
 					imageStyle={[styles.controls.vignette]}>
 					{seekbarControl}
@@ -1489,8 +1489,8 @@ export default class VideoPlayer extends Component {
 	renderPlayPause() {
 		let source =
 			this.state.paused === true
-				? require('../../src/assets/img/play.png')
-				: require('../../src/assets/img/pause.png');
+				? require('../../src/assets/images/icons/play.png')
+				: require('../../src/assets/images/icons/pause.png');
 		return this.renderControl(
 			<Image source={source} />,
 			this.methods.togglePlayPause,
@@ -1537,7 +1537,7 @@ export default class VideoPlayer extends Component {
 			return (
 				<View style={styles.loader.container}>
 					<Animated.Image
-						source={require('../../src/assets/img/loader-icon.png')}
+						source={require('../../src/assets/images/icons/loader-icon.png')}
 						style={[
 							styles.loader.icon,
 							{
@@ -1563,7 +1563,7 @@ export default class VideoPlayer extends Component {
 			return (
 				<View style={styles.error.container}>
 					<Image
-						source={require('../../src/assets/img/error-icon.png')}
+						source={require('../../src/assets/images/icons/error-icon.png')}
 						style={styles.error.icon}
 					/>
 					<Text style={styles.error.text}>{this.state.errorMessage}</Text>
@@ -1630,17 +1630,13 @@ export default class VideoPlayer extends Component {
 	 * Provide all of our options and render the whole component.
 	 */
 	render() {
+		const hasTvWindowFocus = this.state.showControls ? false : this.state.actionSheet ?  false : this.state.isAdVisible ? false  : true
+		const isTvWindowSelectable = this.state.showControls ? false : this.state.actionSheet ?  false : this.state.isAdVisible ? false  : true
 		// console.log('this.state.showControls', this.state.showControls)
 		return (
 			<TouchableHighlight
-			// hasTVPreferredFocus={this.state.showControls ? false : this.state.actionSheet ? false : true}
-
-			// isTVSelectable={this.state.showControls ? false : this.state.actionSheet ? false : true}
-			hasTVPreferredFocus={this.state.showControls ? false : this.state.actionSheet ?  false : this.state.isAdVisible ? false  : true}
-
- 
-
-            isTVSelectable={this.state.showControls ? false : this.state.actionSheet ?  false : this.state.isAdVisible ? false  : true}
+			hasTVPreferredFocus={hasTvWindowFocus}
+            isTVSelectable={isTvWindowSelectable}
 				onPress={this.events.onScreenTouch}
 				style={[styles.player.container, this.styles.containerStyle]}>
 				<View style={[styles.player.container, this.styles.containerStyle]}>
