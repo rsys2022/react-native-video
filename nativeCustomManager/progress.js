@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, SafeAreaView } from 'react-native';
-import { FocusButton } from 'node_modules/react-native-tv-selected-focus';
+import { FocusButton } from 'react-native-tv-selected-focus';
 
 function convertTimeTot(totalSeconds) {
   const tSec = parseInt(totalSeconds);
