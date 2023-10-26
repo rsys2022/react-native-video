@@ -11,7 +11,10 @@ import {
 	Easing,
 	Image,
 	View,
-	Text
+	Text,
+	Platform,
+	TVEventHandler,
+	Dimensions,
 } from 'react-native';
 import padStart from 'lodash/padStart';
 import { ImageIcon, normalize, checkArrayAndElements, filterAndRemoveDuplicates } from './assets/Icon/icon';
@@ -20,6 +23,7 @@ const lang = ['English', 'Dutch'];
 import ActionSheets from './nativeCustomManager/actionSheet';
 import { PercentageBar } from 'react-native-video/nativeCustomManager/progress';
 import { FocusButton } from 'react-native-tv-selected-focus';
+import { VolumeManager } from 'react-native-volume-manager';
 export default class VideoPlayer extends Component {
 	static defaultProps = {
 		toggleResizeModeOnFullscreen: true,
@@ -94,7 +98,9 @@ export default class VideoPlayer extends Component {
 			adBar: 0,
 			adDuration: 0,
 			eventStack: [],
-			isSeeked: false
+			isSeeked: false,
+			isSeekbarFocused: false,
+			isBuffering: false
 		};
 
 		/**
@@ -110,6 +116,7 @@ export default class VideoPlayer extends Component {
 		/**
 		 * Our app listeners and associated methods
 		 */
+		this.tvEventHandler = Platform.isTV ? new TVEventHandler() : null;
 		this.events = {
 			onError: this.props.onError || this._onError.bind(this),
 			onBack: this.props.onBack || this._onBack.bind(this),
@@ -125,6 +132,7 @@ export default class VideoPlayer extends Component {
 			onLoad: this._onLoad.bind(this),
 			onPause: this.props.onPause,
 			onPlay: this.props.onPlay,
+			onBuffer: this._onBuffer.bind(this),
 		};
 
 		/**
@@ -185,7 +193,40 @@ export default class VideoPlayer extends Component {
 			containerStyle: this.props.style || {},
 		};
 		// this.ActionSheetRef = React.createRef();
+
+		this.volumeListener = null
 	}
+
+
+
+	onTVRemoteEvent = (cmp, evt) => {
+		if (evt && evt.eventType === 'right') {
+			console.log('right tv player this.state.isSeekbarFocused', this.state.isSeekbarFocused);
+			if(this.state.isSeekbarFocused){
+				this.player.ref.seek(this.state.currentTime + 10)
+			}
+		} else if (evt && evt.eventType === 'left') {
+			console.log('left tv player');
+			if(this.state.isSeekbarFocused){
+				this.player.ref.seek(this.state.currentTime - 10)
+			}
+		
+		} else if (evt && evt.eventType === 'select') {
+		    console.log('Select/OK button pressed on TV remote.');
+		  
+		} else if (evt && evt.eventType === 'down') {
+			console.log('down tv player');
+			if(this.state.isSeekbarFocused){
+				this.setState((prevState)=> ({...prevState, isSeekbarFocused: false}))
+			}
+		} else if (evt && evt.eventType === 'up') {
+			console.log('up tv player');
+			// if(this.state.isSeekbarFocused){
+			// 	this.setState((prevState)=> ({...prevState, isSeekbarFocused: false}))
+			// }
+		}
+		// Add more cases to handle other remote control events as needed
+	  };
 
 	componentDidUpdate = prevProps => {
 		const { isFullscreen } = this.props;
@@ -195,7 +236,15 @@ export default class VideoPlayer extends Component {
 				isFullscreen,
 			});
 		}
+		
 	};
+	
+	  _disableTVEventHandler() {
+		if (this.tvEventHandler) {
+		  this.tvEventHandler.disable();
+		  delete this.tvEventHandler;
+		}
+	  }
 
 
 	shouldComponentUpdate = (nextProps, nextState) => {
@@ -221,6 +270,7 @@ export default class VideoPlayer extends Component {
 
 
 	parseTrackingJson = (trackList) => {
+		// console.log("trackList", trackList)
 		var trackAvails = [...trackList.avails];
 		var newData = {};
 
@@ -322,7 +372,6 @@ export default class VideoPlayer extends Component {
 				this.onTextTracks(data);
 				this.onVideoTracks(data);
 			}
-
 			state.duration = data.duration;
 			state.loading = false;
 			this.setState(state);
@@ -356,7 +405,16 @@ export default class VideoPlayer extends Component {
 			});
 	}
 
+	/**
+	 * Buffer check
+	 * @param {*} timeString 
+	 * @returns 
+	 */
 
+	_onBuffer(bufferData){
+		this.setState((prevState)=> ({...prevState, isBuffering: bufferData.isBuffering}))
+		// console.log("bufferData --- ", bufferData)
+	}
 
 	/**
  * SHOWING AD UI 
@@ -481,6 +539,7 @@ export default class VideoPlayer extends Component {
 	 * @param {object} data The video meta data
 	 */
 	_onSeek(data = {}) {
+		console.log("stataa", data)
 		let state = this.state;
 		if (state.scrubbing) {
 			state.scrubbing = false;
@@ -503,8 +562,6 @@ export default class VideoPlayer extends Component {
 		// 	return x.selected;
 		// });
 
-		console.log('--audioTracks-------', data.audioTracks);
-
 		state.audioTracks = filterAndRemoveDuplicates(data.audioTracks, 'language');
 		// if (selectedTrack?.language) {
 		// 	this.setState({
@@ -519,7 +576,6 @@ export default class VideoPlayer extends Component {
 		}
 		// }
 		this.setState(state);
-		console.log(state.audioTracks, '--audioTracks-------', data.audioTracks);
 	};
 
 	_onChangeAudio = item => {
@@ -543,7 +599,6 @@ export default class VideoPlayer extends Component {
 	};
 
 	_onChangeText = item => {
-		console.log('TextTrack----------', item.language);
 		this.setState(
 			{
 				selectedTextTrack: {
@@ -612,13 +667,11 @@ export default class VideoPlayer extends Component {
         if(Platform.OS === "ios"){
             return;
         }
-        // console.log("data", data.videoTracks    )
         let state = this.state;
         const unique = data.videoTracks.filter((obj, index) => {
             return index === data.videoTracks.findIndex(o => obj.height === o.height);
         });
         const updatedTrack = unique.map((item)=> {
-            console.log("item", item)
             return {
               type: "resolution",
               value: item.height,
@@ -626,7 +679,6 @@ export default class VideoPlayer extends Component {
             }
         })
         const sortedTrack = updatedTrack.sort((a, b) => {
-            console.log("a", a.value, typeof a.value)
             return b.value - a.value;
         });
         // console.log("sortedTrack",sortedTrack)
@@ -669,7 +721,6 @@ export default class VideoPlayer extends Component {
 	 * two toggles fullscreen mode.
 	 */
 	_onScreenTouch() {
-		console.log(this.player.tapActionTimeout, '<-tapActionTimeout--------showControls->', this.state.showControls)
 		if (this.player.tapActionTimeout) {
 			clearTimeout(this.player.tapActionTimeout);
 			this.player.tapActionTimeout = 0;
@@ -1119,8 +1170,8 @@ export default class VideoPlayer extends Component {
 	 *
 	 * @return {float} volume handle position in px based on volume
 	 */
-	calculateVolumePositionFromVolume() {
-		return this.player.volumeWidth * this.state.volume;
+	calculateVolumePositionFromVolume(fromListenerVolume = this.state.volume) {
+		return this.player.volumeWidth * fromListenerVolume;
 	}
 
 	/**
@@ -1168,6 +1219,7 @@ export default class VideoPlayer extends Component {
 	 * bar based on the volume property supplied to it.
 	 */
 	componentDidMount() {
+		
 		const position = this.calculateVolumePositionFromVolume();
 		let state = this.state;
 		this.setVolumePosition(position);
@@ -1175,6 +1227,27 @@ export default class VideoPlayer extends Component {
 		this.mounted = true;
 
 		this.setState(state);
+		if(Platform.OS === "android" ){
+		this.volumeListener = VolumeManager.addVolumeListener((result) => {
+			const position = this.calculateVolumePositionFromVolume(result.volume);
+			let state = this.state;
+			this.setVolumePosition(position);
+			state.volumeOffset = position;
+			this.setState(state);
+			// On Android, additional volume types are available:
+			// music, system, ring, alarm, notification
+		  });
+		}
+		// console.log("isFocused in ppppp oyyy", this.props.isFocused, prevProps.isFocused)
+
+		if (!this.props.isFocused) {
+			this._disableTVEventHandler();
+		} else if(this.props.isFocused) {
+		 	if (Platform.isTV) {
+				this.tvEventHandler.enable(this, this.onTVRemoteEvent);
+			}
+		}
+		  
 	}
 
 	/**
@@ -1184,6 +1257,8 @@ export default class VideoPlayer extends Component {
 	componentWillUnmount() {
 		this.mounted = false;
 		this.clearControlTimeout();
+		!Platform.isTv && this.volumeListener.remove();
+		this._disableTVEventHandler();
 	}
 
 	/**
@@ -1290,7 +1365,7 @@ export default class VideoPlayer extends Component {
 
 				this.setVolumePosition(position);
 				state.volume = this.calculateVolumeFromVolumePosition();
-
+				Platform.OS === "android" && VolumeManager.setVolume(state.volume)
 				if (state.volume <= 0) {
 					state.muted = true;
 				} else {
@@ -1372,10 +1447,10 @@ export default class VideoPlayer extends Component {
 		const backControl = this.props.disableBack
 			? this.renderNullControl()
 			: this.renderBack();
-		const volumeControl = this.props.disableVolume
+		const volumeControl = Platform.isTV  || this.props.disableVolume
 			? this.renderNullControl()
-			: this.renderVolume();
-		const fullscreenControl = this.props.disableFullscreen
+			:  this.renderVolume();
+		const fullscreenControl =   Platform.isTV  || this.props.disableFullscreen
 			? this.renderNullControl()
 			: this.renderFullscreen();
 
@@ -1461,6 +1536,7 @@ export default class VideoPlayer extends Component {
 	 * Render bottom control group and wrap it in a holder
 	 */
 	renderBottomControls() {
+		const {isLive} = this.props
 		const timerControl = this.props.disableTimer
 			? this.renderNullControl()
 			: this.renderTimer();
@@ -1489,7 +1565,19 @@ export default class VideoPlayer extends Component {
 						{this.state.showControls ? playPauseControl : (<View style={{ width: 40 }}></View>)}
 						{(checkArrayAndElements(this.state.audioTracks) || checkArrayAndElements(this.state.textTracks)) ? this.settingIcon() : null}
 						{this.renderTitle()}
-						{timerControl}
+						{/* {timerControl} */}
+						{
+							isLive ?
+							(
+								<View style={{flexDirection: "row", justifyContent: "space-between", marginRight: 10}}>
+									<View style={{height: 8, width: 8, borderRadius: 8, backgroundColor: "red", alignSelf: "center", marginRight: 5}}/>
+									<Text style={{color: "white"}}>LIVE</Text>
+								</View>
+							)
+							:
+							timerControl
+						}
+						
 					</SafeAreaView>
 				</ImageBackground>
 			</Animated.View>
@@ -1500,40 +1588,87 @@ export default class VideoPlayer extends Component {
 	 * Render the seekbar and attach its handlers
 	 */
 	renderSeekbar() {
+		const {isLive} = this.props
+		const {seekerFillWidth, seekerPosition} = this.state
 		return (
-			<View
-				style={styles.seekbar.container}
-				collapsable={false}
-				{...this.player.seekPanResponder.panHandlers}>
-				<View
-					style={styles.seekbar.track}
-					onLayout={event =>
-						(this.player.seekerWidth = event.nativeEvent.layout.width)
-					}
-					pointerEvents={'none'}>
+		  <FocusButton
+			hasTVPreferredFocus={false}
+			isTVSelectable={this.state.setTvFocus}
+			tvParallaxProperties={{
+				enabled: true,
+			}}
+			focusValue={1.03}
+			onFocus={() => { 
+				this.setState((prevState)=> ({...prevState ,isSeekbarFocused: true}))
+			}}
+			onPress={() => {}}
+			style={{width: Dimensions.get("window").width}}
+			>
+				{
+					isLive ? (
+						<View
+							style={styles.seekbar.container}
+						>
+							<View
+								style={[styles.seekbar.track, {
+									backgroundColor: this.props.seekColor || '#FFF',
+								}]}
+								onLayout={event =>
+									(this.player.seekerWidth = event.nativeEvent.layout.width)
+								}
+								pointerEvents={'none'}>
+								
+							</View>
+							<View
+								style={[styles.seekbar.handle1]}
+								>
+								<View
+									style={[
+										styles.seekbar.circle1,
+										{ backgroundColor: this.props.seekColor || '#FFF' },
+									]}
+								/>
+							</View>
+						</View>
+					):
+					(
 					<View
-						style={[
-							styles.seekbar.fill,
-							{
-								width: this.state.seekerFillWidth,
-								backgroundColor: this.props.seekColor || '#FFF',
-							},
-						]}
-						pointerEvents={'none'}
-					/>
-				</View>
-				<View
-					style={[styles.seekbar.handle, { left: this.state.seekerPosition }]}
-					pointerEvents={'none'}>
-					<View
-						style={[
-							styles.seekbar.circle,
-							{ backgroundColor: this.props.seekColor || '#FFF' },
-						]}
-						pointerEvents={'none'}
-					/>
-				</View>
-			</View>
+						style={styles.seekbar.container}
+						collapsable={false}
+						{...this.player.seekPanResponder.panHandlers}
+						>
+						<View
+							style={styles.seekbar.track}
+							onLayout={event =>
+								(this.player.seekerWidth = event.nativeEvent.layout.width)
+							}
+							pointerEvents={'none'}>
+							<View
+								style={[
+									styles.seekbar.fill,
+									{
+										width: this.state.seekerFillWidth,
+										backgroundColor: this.props.seekColor || '#FFF',
+									},
+								]}
+								pointerEvents={'none'}
+							/>
+						</View>
+						<View
+							style={[styles.seekbar.handle, { left: this.state.seekerPosition }]}
+							pointerEvents={'none'}>
+							<View
+								style={[
+									styles.seekbar.circle,
+									{ backgroundColor: this.props.seekColor || '#FFF' },
+								]}
+								pointerEvents={'none'}
+							/>
+						</View>
+					</View>
+					)
+				}				
+		  </FocusButton>
 		);
 	}
 
@@ -1587,7 +1722,7 @@ export default class VideoPlayer extends Component {
 	 * Show loading icon
 	 */
 	renderLoader() {
-		if (this.state.loading) {
+		if (this.state.loading || this.state.isBuffering) {
 			return (
 				<View style={styles.loader.container}>
 					<Animated.Image
@@ -1684,7 +1819,6 @@ export default class VideoPlayer extends Component {
 	 * Provide all of our options and render the whole component.
 	 */
 	render() {
-		// console.log('this.state.showControls', this.state.showControls)
 		return (
 			<TouchableHighlight
 				// hasTVPreferredFocus={this.state.showControls ? false : this.state.actionSheet ? false : true}
@@ -1717,6 +1851,7 @@ export default class VideoPlayer extends Component {
 						selectedVideoTrack={this.state.selectedVideoTracks}
                         source={this.state.video_source}
                         bitRateSelected={this.state.bitRateSelected}
+						onBuffer={this.events.onBuffer}    
 					/>
 					{this.renderError()}
 					{this.props.control ? this.renderLoader() : null}
@@ -1740,7 +1875,7 @@ export default class VideoPlayer extends Component {
 								margin: 0,
 								justifyContent: 'flex-end',
 								flex: 1
-							}} onPress={() => this.setState({ actionSheet: false })}>
+							}} >
 							{this.state.actionSheet ?
 									(<ActionSheets
 										audioTracks={this.state.audioTracks}
@@ -1754,9 +1889,7 @@ export default class VideoPlayer extends Component {
 										isFullScreen={this.props.fullscreen}
 										onTextTracksChange={(item) => this._onChangeText(item)}
 										onVideoTrackChange={(item) => this._onChangeVideoBitrate(item)}
-										onCancel={() => this.setState({ actionSheet: false, setTvFocus: true }, () => {
-											console.log("this.state.showControls >>>> ", this.state.showControls, this.state.actionSheet)
-										})}
+										onCancel={() => this.setState({ actionSheet: false, setTvFocus: true })}
 										onTextTracksOff={() => this.onTextTracksOff()}
 									/>)
 									:
@@ -1969,6 +2102,22 @@ const styles = {
 		circle: {
 			borderRadius: 12,
 			position: 'relative',
+			top: 8,
+			left: 8,
+			height: 12,
+			width: 12,
+		},
+		handle1: {
+			position: 'absolute',
+			marginLeft: -7,
+			height: 28,
+			width: 28,
+			right: -10,
+
+		},
+		circle1: {
+			borderRadius: 12,
+			// position: 'relative',
 			top: 8,
 			left: 8,
 			height: 12,
