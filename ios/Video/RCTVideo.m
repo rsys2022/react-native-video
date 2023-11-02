@@ -1157,7 +1157,7 @@ static int const RCTVideoUnset = -1;
     }
   } else { // default. invalid type or "system"
     #if TARGET_OS_TV
-    // Do noting. Fix for tvOS native audio menu language selector
+     [_player.currentItem selectMediaOptionAutomaticallyInMediaSelectionGroup:group];
     #else
       [_player.currentItem selectMediaOptionAutomaticallyInMediaSelectionGroup:group];
       return;
@@ -1165,7 +1165,7 @@ static int const RCTVideoUnset = -1;
   }
 
     #if TARGET_OS_TV
-    // Do noting. Fix for tvOS native audio menu language selector
+       [_player.currentItem selectMediaOption:mediaOption inMediaSelectionGroup:group];
     #else
        // If a match isn't found, option will be nil and text tracks will be disabled
        [_player.currentItem selectMediaOption:mediaOption inMediaSelectionGroup:group];
