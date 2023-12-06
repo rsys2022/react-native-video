@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Video from './Video.App';
-import ActionSheet from 'react-native-actions-sheet';
 import {
 	TouchableHighlight,
 	ImageBackground,
@@ -19,11 +18,11 @@ import {
 import padStart from 'lodash/padStart';
 import { ImageIcon, normalize, checkArrayAndElements, filterAndRemoveDuplicates } from './assets/Icon/icon';
 import Modal from 'react-native-modal';
-const lang = ['English', 'Dutch'];
 import ActionSheets from './nativeCustomManager/actionSheet';
 import { PercentageBar } from 'react-native-video/nativeCustomManager/progress';
 import { FocusButton } from 'react-native-tv-selected-focus';
 import { VolumeManager } from 'react-native-volume-manager';
+
 export default class VideoPlayer extends Component {
 	static defaultProps = {
 		toggleResizeModeOnFullscreen: true,
@@ -1557,6 +1556,7 @@ export default class VideoPlayer extends Component {
 				]}>
 				<ImageBackground
 					source={require('./assets/img/bottom-vignette.png')}
+
 					style={[styles.controls.column]}
 					imageStyle={[styles.controls.vignette]}>
 					{seekbarControl}
@@ -1727,6 +1727,7 @@ export default class VideoPlayer extends Component {
 				<View style={styles.loader.container}>
 					<Animated.Image
 						source={require('./assets/img/loader-icon.png')}
+
 						style={[
 							styles.loader.icon,
 							{
