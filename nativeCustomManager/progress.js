@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, SafeAreaView } from 'react-native';
-import { FocusButton } from 'node_modules/react-native-tv-selected-focus';
+import { FocusButton } from 'react-native-tv-selected-focus';
 
 function convertTimeTot(totalSeconds) {
   const tSec = parseInt(totalSeconds);
@@ -16,18 +16,11 @@ function convertTimeTot(totalSeconds) {
 
 
 export const PercentageBar = ({
-  navigation,
   percentage = "0%",
-  height = 5,
-  backgroundColor = "white",
-  completedColor = "yellow",
-  initialTime = 9000,
   showSkip,
   onSkipPress,
   playPauseCall,
   isPaused,
-  isMuted,
-  setMuteValue,
   adDuration,
   setTvFocus
 }) => {

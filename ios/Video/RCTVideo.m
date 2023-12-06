@@ -1028,6 +1028,25 @@ static int const RCTVideoUnset = -1;
   _playerItem.preferredPeakBitRate = maxBitRate;
 }
 
+
+- (void)setBitRateSelected:(float)bitRateSelected {
+//    NSLog(@"bitRateSelected: %f", bitRateSelected);
+    if (bitRateSelected != 0) {
+        _playerItem.preferredPeakBitRate = bitRateSelected;
+        
+//       NSLog(@"_playerItem : %@", _playerItem.preferredPeakBitRate);
+//      Get the video track
+//        AVAssetTrack *videoTrack = [[_playerItem.asset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
+////        // Access and log the width and height of the video track
+//        CGFloat width = videoTrack.naturalSize.width;
+//        CGFloat height = videoTrack.naturalSize.height;
+////        NSLog(@"Width: %f", width);
+////        NSLog(@"Height: %f", height);
+//
+    }
+    
+}
+
 - (void)setPreferredForwardBufferDuration:(float) preferredForwardBufferDuration
 {
   _preferredForwardBufferDuration = preferredForwardBufferDuration;
@@ -1138,7 +1157,7 @@ static int const RCTVideoUnset = -1;
     }
   } else { // default. invalid type or "system"
     #if TARGET_OS_TV
-    // Do noting. Fix for tvOS native audio menu language selector
+     [_player.currentItem selectMediaOptionAutomaticallyInMediaSelectionGroup:group];
     #else
       [_player.currentItem selectMediaOptionAutomaticallyInMediaSelectionGroup:group];
       return;
@@ -1146,7 +1165,7 @@ static int const RCTVideoUnset = -1;
   }
 
     #if TARGET_OS_TV
-    // Do noting. Fix for tvOS native audio menu language selector
+       [_player.currentItem selectMediaOption:mediaOption inMediaSelectionGroup:group];
     #else
        // If a match isn't found, option will be nil and text tracks will be disabled
        [_player.currentItem selectMediaOption:mediaOption inMediaSelectionGroup:group];
