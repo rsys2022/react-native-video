@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Video from './Video.App';
+import ActionSheet from 'react-native-actions-sheet';
 import {
 	TouchableHighlight,
 	ImageBackground,
@@ -18,11 +19,11 @@ import {
 import padStart from 'lodash/padStart';
 import { ImageIcon, normalize, checkArrayAndElements, filterAndRemoveDuplicates } from './assets/Icon/icon';
 import Modal from 'react-native-modal';
+const lang = ['English', 'Dutch'];
 import ActionSheets from './nativeCustomManager/actionSheet';
 import { PercentageBar } from 'react-native-video/nativeCustomManager/progress';
 import { FocusButton } from 'react-native-tv-selected-focus';
 import { VolumeManager } from 'react-native-volume-manager';
-
 export default class VideoPlayer extends Component {
 	static defaultProps = {
 		toggleResizeModeOnFullscreen: true,
@@ -90,16 +91,20 @@ export default class VideoPlayer extends Component {
 			errorMessage: '',
 			controls: this.props.control,
 			isAdVisible: false,
-			trackJson: this.props.trackingJson ? this.parseTrackingJson(this.props.trackingJson) : null,
-			eventJson: this.props.trackingJson ? this.parseEventJson(this.props.trackingJson) : null,
+			trackJson: this.props.trackingJson !== null && this.props.trackingJson !== undefined ? this.parseTrackingJson(this.props.trackingJson) : null,
+			adMarkers: this.props.trackingJson !== null && this.props.trackingJson !== undefined ? this.getAdMarkersData(this.props.trackingJson) : null,
+			eventJson: null,
 			showSkip: false,
 			skipTo: 0,
 			adBar: 0,
 			adDuration: 0,
 			eventStack: [],
+			adMarkerPercent: null,
 			isSeeked: false,
 			isSeekbarFocused: false,
-			isBuffering: false
+			isBuffering: false,
+			forwardBackwardCount: 0,
+			fastForwardBackwardPosition: 0
 		};
 
 		/**
@@ -204,12 +209,25 @@ export default class VideoPlayer extends Component {
 			if(this.state.isSeekbarFocused){
 				this.player.ref.seek(this.state.currentTime + 10)
 			}
-		} else if (evt && evt.eventType === 'left') {
+		}   else if (evt && evt.eventType === 'longRight') {
+			if (this.state.isSeekbarFocused) {
+				this.setState({
+					paused: true,
+					forwardBackwardCount: this.state.forwardBackwardCount + 10,
+					fastForwardBackwardPosition: ((this.state.currentTime + this.state.forwardBackwardCount + 10) / this.state.duration) * this.player.seekerWidth,
+				})}
+		}  else if (evt && evt.eventType === 'left') {
 			console.log('left tv player');
 			if(this.state.isSeekbarFocused){
 				this.player.ref.seek(this.state.currentTime - 10)
 			}
-		
+		} else if (evt && evt.eventType === 'longLeft') {
+			if (this.state.isSeekbarFocused) {
+				this.setState({
+					paused: true,
+					forwardBackwardCount: this.state.forwardBackwardCount - 10,
+					fastForwardBackwardPosition: ((this.state.currentTime + this.state.forwardBackwardCount - 10) / this.state.duration) * this.player.seekerWidth,
+				})}
 		} else if (evt && evt.eventType === 'select') {
 		    console.log('Select/OK button pressed on TV remote.');
 		  
@@ -247,13 +265,25 @@ export default class VideoPlayer extends Component {
 
 
 	shouldComponentUpdate = (nextProps, nextState) => {
-		if (this.props.trackingJson !== nextProps.trackingJson) {
+		if (this.props.trackingJson !== nextProps.trackingJson  ) {
 			const trackingJson = this.parseTrackingJson(nextProps.trackingJson)
-			const eventJson = this.parseEventJson(nextProps.trackingJson)
-			this.setState({
+			// const eventJson = this.parseEventJson(nextProps.trackingJson)
+			const adMarkers = this.getAdMarkersData(nextProps.trackingJson)
+			let adMarkerPercent = null
+			console.log("hii", this.state.duration)
+			if(this.state.duration){
+				console.log("hii  222 ", this.state.duration)
+				adMarkerPercent = this.calculateAdMarkerPosition(this.state.duration, adMarkers)
+			}
+			console.log("hii", adMarkerPercent, adMarkers)
+
+			this.setState((prevState)=>({
+				...prevState,
 				trackJson: trackingJson,
-				eventJson: eventJson
-			})
+				eventJson: null,
+				adMarkerPercent: adMarkerPercent,
+				adMarkers: adMarkers
+			}))
 			return true
 		} else if (this.state !== nextState) {
 			return true
@@ -266,7 +296,16 @@ export default class VideoPlayer extends Component {
 
 
 
+	getAdMarkersData = (trackList) => {
+		// console.log("trackList sdsds ===>  ", trackList.avails);
+		let adTimeArray = []
+		trackList.avails.map((value)=> {
+			adTimeArray.push(value.startTimeInSeconds)
+		})
+		console.log("adTimeArray sdsds ===>  ", adTimeArray);
 
+		return [...adTimeArray];
+	}
 
 	parseTrackingJson = (trackList) => {
 		// console.log("trackList", trackList)
@@ -295,7 +334,7 @@ export default class VideoPlayer extends Component {
 				newData = { ...newData, ...data };
 			});
 		});
-		return newData;
+ 		return newData;
 	}
 
 	parseEventJson = (trackList) => {
@@ -371,7 +410,10 @@ export default class VideoPlayer extends Component {
 				this.onTextTracks(data);
 				this.onVideoTracks(data);
 			}
+			
 			state.duration = data.duration;
+			// console.log("this.state.duration assss", data.duration, state.adMarkers)
+			state.adMarkerPercent = this.calculateAdMarkerPosition(data.duration)
 			state.loading = false;
 			this.setState(state);
 
@@ -383,7 +425,7 @@ export default class VideoPlayer extends Component {
 				this.props.onLoad(...arguments);
 			}
 		} catch (error) {
-			console.log('Error on Load-')
+			console.log('Error on Load-', error)
 		}
 
 	}
@@ -411,8 +453,14 @@ export default class VideoPlayer extends Component {
 	 */
 
 	_onBuffer(bufferData){
-		this.setState((prevState)=> ({...prevState, isBuffering: bufferData.isBuffering}))
-		// console.log("bufferData --- ", bufferData)
+		this.setState((prevState) => ({ ...prevState, isBuffering: bufferData.isBuffering }))
+		console.log("bufferData --- ", bufferData)
+		if (!bufferData.isBuffering) {
+			this.setState({
+				forwardBackwardCount: 0
+			})
+		}
+
 	}
 
 	/**
@@ -557,18 +605,10 @@ export default class VideoPlayer extends Component {
 
 	onAudioTracks = (data) => {
 		let state = this.state;
-		// const selectedTrack = data.audioTracks?.find((x: any) => {
-		// 	return x.selected;
-		// });
+	
 
 		state.audioTracks = filterAndRemoveDuplicates(data.audioTracks, 'language');
-		// if (selectedTrack?.language) {
-		// 	this.setState({
-		// 		selectedAudioTrack: {
-		// 			type: 'language',
-		// 			value: selectedTrack?.language,
-		// 		},
-		// 	});
+		
 		state.selectedAudioTrack = {
 			type: 'language',
 			value: state.audioTracks[0]?.language,
@@ -938,6 +978,12 @@ export default class VideoPlayer extends Component {
 			typeof this.events.onPause === 'function' && this.events.onPause();
 		} else {
 			typeof this.events.onPlay === 'function' && this.events.onPlay();
+			if (this.state.forwardBackwardCount) {
+				this.player.ref.seek(this.state.currentTime + (this.state.forwardBackwardCount))
+				this.setState({
+					seekerPosition: this.state.fastForwardBackwardPosition
+				})
+			}
 		}
 
 		this.setState(state);
@@ -1059,6 +1105,21 @@ export default class VideoPlayer extends Component {
 		const percent = this.state.currentTime / this.state.duration;
 		return this.player.seekerWidth * percent;
 	}
+
+	 calculateAdMarkerPosition =(duration, adMarker = this.state.adMarkers) =>{
+		console.log("this.state.duration", duration, this.state.adMarkers)
+		if(adMarker.length <= 0)
+		{
+			return null;
+		}
+		let adMarkerArray = [...adMarker].map((element)=> {
+			console.log("element")
+			return (element / duration)* 100;
+		})
+		console.log("adMarkerArray", adMarkerArray)
+		return [...adMarkerArray]
+	}
+
 
 	/**
 	 * Return the time that the video should be at
@@ -1256,7 +1317,7 @@ export default class VideoPlayer extends Component {
 	componentWillUnmount() {
 		this.mounted = false;
 		this.clearControlTimeout();
-		!Platform.isTv && this.volumeListener.remove();
+		!Platform.isTv && Platform.OS !== "ios" && this.volumeListener.remove();
 		this._disableTVEventHandler();
 	}
 
@@ -1556,7 +1617,6 @@ export default class VideoPlayer extends Component {
 				]}>
 				<ImageBackground
 					source={require('./assets/img/bottom-vignette.png')}
-
 					style={[styles.controls.column]}
 					imageStyle={[styles.controls.vignette]}>
 					{seekbarControl}
@@ -1584,12 +1644,65 @@ export default class VideoPlayer extends Component {
 		);
 	}
 
-	/**
+		/**
 	 * Render the seekbar and attach its handlers
 	 */
+		// renderSeekbar() {
+		// 	const {isLive} = this.props
+		// 	const {seekerFillWidth, seekerPosition} = this.state
+		// 	return (
+		// 				<View
+		// 					style={styles.seekbar.container}
+		// 					collapsable={false}
+		// 					{...this.player.seekPanResponder.panHandlers}
+		// 					>
+		// 					<View
+		// 						style={styles.seekbar.track}
+		// 						onLayout={event =>
+		// 							(this.player.seekerWidth = event.nativeEvent.layout.width)
+		// 						}
+		// 						pointerEvents={'none'}>
+		// 						<View
+		// 							style={[
+		// 								styles.seekbar.fill,
+		// 								{
+		// 									width: this.state.seekerFillWidth,
+		// 									backgroundColor: this.props.seekColor || '#FFF',
+		// 								},
+		// 							]}
+		// 							pointerEvents={'none'}
+		// 						/>
+		// 					</View>
+		// 					<View
+		// 						style={[styles.seekbar.handle, { left: this.state.seekerPosition }]}
+		// 						pointerEvents={'none'}>
+		// 						<View
+		// 							style={[
+		// 								styles.seekbar.circle,
+		// 								{ backgroundColor: this.props.seekColor || '#FFF' },
+		// 							]}
+		// 							pointerEvents={'none'}
+		// 						/>
+		// 					</View>
+		// 				    {
+		// 						this.state.adMarkerPercent && this.state.adMarkerPercent.map(values => {
+		// 							return (
+		// 								<View style={{height: 2.5, width: 2 , backgroundColor: "yellow", left: `${values+1}%`, position: "absolute", zIndex: 1000, top: 13.5,}} />
+		// 							)
+		// 						})
+		// 					}
+		// 				</View>
+						
+		// 	);
+		// }
+
+	// /**
+	//  * Render the seekbar and attach its handlers
+	//  */
 	renderSeekbar() {
 		const {isLive} = this.props
 		const {seekerFillWidth, seekerPosition} = this.state
+		console.log("seekerFillWidth ::: ", seekerFillWidth)
 		return (
 		  <FocusButton
 			hasTVPreferredFocus={false}
@@ -1665,6 +1778,14 @@ export default class VideoPlayer extends Component {
 								pointerEvents={'none'}
 							/>
 						</View>
+						{
+		 						this.state.adMarkerPercent && this.state.adMarkerPercent.map(values => {
+		 							return (
+		 								<View style={{height: 2.5, width: 2 , backgroundColor: "yellow", left: `${values+1}%`, position: "absolute", zIndex: 1000, top: 13.5,}} />
+		 							)
+		 						})
+		 					}
+
 					</View>
 					)
 				}				
@@ -1727,7 +1848,6 @@ export default class VideoPlayer extends Component {
 				<View style={styles.loader.container}>
 					<Animated.Image
 						source={require('./assets/img/loader-icon.png')}
-
 						style={[
 							styles.loader.icon,
 							{
@@ -1824,13 +1944,17 @@ export default class VideoPlayer extends Component {
 			<TouchableHighlight
 				// hasTVPreferredFocus={this.state.showControls ? false : this.state.actionSheet ? false : true}
 				// isTVSelectable={this.state.showControls ? false : this.state.actionSheet ? false : true}
-				hasTVPreferredFocus={this.state.showControls ? false : this.state.actionSheet ? false : this.state.isAdVisible ? false : true}
-				isTVSelectable={this.state.showControls ? false : this.state.actionSheet ? false : this.state.isAdVisible ? false : true}
+				// hasTVPreferredFocus={this.state.showControls ? false : this.state.actionSheet ? false : this.state.isAdVisible ? false : true}
+				// isTVSelectable={this.state.showControls ? false : this.state.actionSheet ? false : this.state.isAdVisible ? false : true}
+				hasTVPreferredFocus={this.state.showControls ? false : (this.state.actionSheet ? false : this.state.isAdVisible ? false : true) || (this.state.isSeekbarFocused ? false : true)}
+				isTVSelectable={this.state.showControls ? false : (this.state.actionSheet ? false : this.state.isAdVisible ? false : true) || (this.state.isSeekbarFocused ? false : true)}
+
 				onPress={this.events.onScreenTouch}
 				style={[styles.player.container, this.styles.containerStyle]}>
 				<View style={[styles.player.container, this.styles.containerStyle]}>
 					<Video
 						{...this.props}
+						controls={false}
 						ref={videoPlayer => (this.player.ref = videoPlayer)}
 						resizeMode={this.state.resizeMode}
 						volume={this.state.volume}
@@ -2084,14 +2208,14 @@ const styles = {
 		},
 		track: {
 			backgroundColor: '#333',
-			height: 1,
+			height: 2.5,
 			position: 'relative',
 			top: 14,
 			width: '100%',
 		},
 		fill: {
 			backgroundColor: '#FFF',
-			height: 1,
+			height: 2.5,
 			width: '100%',
 		},
 		handle: {
