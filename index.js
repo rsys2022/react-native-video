@@ -309,6 +309,9 @@ export default class VideoPlayer extends Component {
 
 	parseTrackingJson = (trackList) => {
 		// console.log("trackList", trackList)
+		if(trackList === null){
+			return null
+		}
 		var trackAvails = [...trackList.avails];
 		var newData = {};
 
