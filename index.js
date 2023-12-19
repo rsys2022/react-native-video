@@ -205,29 +205,36 @@ export default class VideoPlayer extends Component {
 
 	onTVRemoteEvent = (cmp, evt) => {
 		if (evt && evt.eventType === 'right') {
-			console.log('right tv player this.state.isSeekbarFocused', this.state.isSeekbarFocused);
 			if(this.state.isSeekbarFocused){
 				this.player.ref.seek(this.state.currentTime + 10)
 			}
 		}   else if (evt && evt.eventType === 'longRight') {
 			if (this.state.isSeekbarFocused) {
-				this.setState({
+				this.setState((prevState) => ({
+					...prevState,
 					paused: true,
 					forwardBackwardCount: this.state.forwardBackwardCount + 10,
-					fastForwardBackwardPosition: ((this.state.currentTime + this.state.forwardBackwardCount + 10) / this.state.duration) * this.player.seekerWidth,
-				})}
+					fastForwardBackwardPosition: ((this.state.currentTime + 10) / this.state.duration) * this.player.seekerWidth,
+					seekerFillWidth:((this.state.currentTime + 10) / this.state.duration) * this.player.seekerWidth,
+					currentTime:(this.state.currentTime + 10),
+				}))
+				}
 		}  else if (evt && evt.eventType === 'left') {
-			console.log('left tv player');
 			if(this.state.isSeekbarFocused){
 				this.player.ref.seek(this.state.currentTime - 10)
 			}
 		} else if (evt && evt.eventType === 'longLeft') {
 			if (this.state.isSeekbarFocused) {
-				this.setState({
+				this.setState((prevState) => ({
+					...prevState,
 					paused: true,
 					forwardBackwardCount: this.state.forwardBackwardCount - 10,
-					fastForwardBackwardPosition: ((this.state.currentTime + this.state.forwardBackwardCount - 10) / this.state.duration) * this.player.seekerWidth,
-				})}
+					fastForwardBackwardPosition: ((this.state.currentTime - 10) / this.state.duration) * this.player.seekerWidth,
+					seekerFillWidth:((this.state.currentTime - 10) / this.state.duration) * this.player.seekerWidth,
+					currentTime:(this.state.currentTime - 10),
+				}))
+			}
+
 		} else if (evt && evt.eventType === 'select') {
 		    console.log('Select/OK button pressed on TV remote.');
 		  
@@ -589,7 +596,7 @@ export default class VideoPlayer extends Component {
 	 * @param {object} data The video meta data
 	 */
 	_onSeek(data = {}) {
-		console.log("stataa", data)
+		// console.log("stataa", data)
 		let state = this.state;
 		if (state.scrubbing) {
 			state.scrubbing = false;
@@ -990,7 +997,7 @@ export default class VideoPlayer extends Component {
 		} else {
 			typeof this.events.onPlay === 'function' && this.events.onPlay();
 			if (this.state.forwardBackwardCount) {
-				this.player.ref.seek(this.state.currentTime + (this.state.forwardBackwardCount))
+				this.player.ref.seek(this.state.currentTime)
 				this.setState({
 					seekerPosition: this.state.fastForwardBackwardPosition
 				})
@@ -1713,7 +1720,6 @@ export default class VideoPlayer extends Component {
 	renderSeekbar() {
 		const {isLive} = this.props
 		const {seekerFillWidth, seekerPosition} = this.state
-		console.log("seekerFillWidth ::: ", seekerFillWidth)
 		return (
 		  <FocusButton
 			hasTVPreferredFocus={false}
@@ -1779,7 +1785,7 @@ export default class VideoPlayer extends Component {
 							/>
 						</View>
 						<View
-							style={[styles.seekbar.handle, { left: this.state.seekerPosition }]}
+							style={[styles.seekbar.handle, { left: this.state.forwardBackwardCount !== 0 ? this.state.fastForwardBackwardPosition : this.state.seekerPosition }]}							
 							pointerEvents={'none'}>
 							<View
 								style={[
