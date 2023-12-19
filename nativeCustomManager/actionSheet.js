@@ -1415,7 +1415,7 @@ import { checkArrayAndElements, ImageIcon, normalize } from '../assets/Icon/icon
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
 import FontIstoIcon from 'react-native-vector-icons/Fontisto'
-import { FocusButton } from 'react-native-tv-selected-focus';
+import { FocusButton, FocusText } from 'react-native-tv-selected-focus';
 import { gray } from '../../../src/helper/Color';
 import { FlatList } from 'react-native-gesture-handler';
 
@@ -1462,7 +1462,7 @@ const ActionSheet = (props) => {
             data: videoTracks ? [...videoTracks] : []
         }
     ])
-
+    // console.log("textTracks :: +++ :: ", textTracks)
     // const [selectedSettingType, setSelectedSettingType] = useState(0)
     // const [currentSelectedVal, setCurrentSelectedVal] = useState(null)
     const [textWidths, setTextWidth] = useState([])
@@ -1582,30 +1582,32 @@ const ActionSheet = (props) => {
 
                                 // const isSelected = selectedTextTrack === item[section.dataAttr] ? 
                                 return(
-                                    <FocusButton
-                                    tvParallaxProperties={{
-                                        enabled: true,
-                                        magnification: 1.05,
-                                    }}
-                                    hasTVPreferredFocus={false}
+                                    <FocusText
+                                        tvParallaxProperties={{
+                                            enabled: true,
+                                            magnification: 1.05,
+                                        }}
+                                        hasTVPreferredFocus={false}
 
-                                    onlyText={true}
-                                    isTVSelectable={true}
-                                    onFocus={() => {}}
-                                    underlayColor={gray}
-                                    // style={{flexDirection: "row",  marginBottom: 5, width: "100%", paddingLeft: 15}}
-                                    activeOpacity={0.4}
-                                    // style={{ marginBottom: 5}}
-                                    // animatedStyle={{ width: "20%"}}
-                                    onPress={() => 
-                                        {
-                                            setSelectedValue(item, section.title)
-                                            // setCurrentSelectedVal(item[section.dataAttr])
+                                        onlyText={true}
+                                        isTVSelectable={true}
+                                        onFocus={() => {}}
+                                        underlayColor={gray}
+                                        // style={{flexDirection: "row",  marginBottom: 5, width: "100%", paddingLeft: 15}}
+                                        activeOpacity={0.4}
+                                        // style={{ marginBottom: 5}}
+                                        // animatedStyle={{ width: "20%"}}
+                                        onPress={() => 
+                                            {
+                                                setSelectedValue(item, section.title)
+                                                // setCurrentSelectedVal(item[section.dataAttr])
+                                            }
                                         }
-                                    }
-                                    style={{paddingHorizontal: 20, paddingVertical: 8}}>
-                                        <Text style={{color: isSelected ? "#4682B4": "white", fontFamily: 'Montserrat-Medium', justifyContent: "center", fontSize: normalize(1.6), marginLeft: 5, alignItems: "center"}}>{item[section.dataAttr]}</Text>
-                                    </FocusButton>
+                                        value={item[section.dataAttr]}
+                                        containerStyle={{paddingHorizontal: 20, paddingVertical: 8, width : 90}}
+                                        textStyle={{color: isSelected ? "#4682B4": "white", fontFamily: 'Montserrat-Medium', justifyContent: "center", fontSize: normalize(1.6), marginLeft: 5, alignItems: "center"}}
+                                    />
+                                        
                             )}}
                             renderSectionHeader={({section: {title}}) => (
                                 <View style={{backgroundColor: "#1F456E", padding: 10}}>

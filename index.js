@@ -682,12 +682,20 @@ export default class VideoPlayer extends Component {
 		// const selectedTrack = data.textTracks?.find((x: any) => {
 		// 	return x.selected;
 		// });
-		state.textTracks = filterAndRemoveDuplicates(data.textTracks, 'language');
+		state.textTracks = [{
+			index: 25, language: "Off", title: "nil", type: "disable"
+		}, ...filterAndRemoveDuplicates(data.textTracks, 'language')];
 		// console.log('Text Data------', data.textTracks)
+		
 		state.selectedTextTrack = {
-			type: 'disable',
-			value: 'Off',
+			index: 25, language: "Off", title: "nil", type: "disable", value: 'Off'
 		}
+
+		// console.log('Text Data------', data.textTracks)
+		// state.selectedTextTrack = {
+		// 	type: 'disable',
+		// 	value: 'Off',
+		// }
 
 		this.setState(state);
 	};
@@ -1108,9 +1116,9 @@ export default class VideoPlayer extends Component {
 
 	 calculateAdMarkerPosition =(duration, adMarker = this.state.adMarkers) =>{
 		console.log("this.state.duration", duration, this.state.adMarkers)
-		if(adMarker.length <= 0)
+		if(adMarker === null || adMarker.length <= 0)
 		{
-			return null;
+			return [];
 		}
 		let adMarkerArray = [...adMarker].map((element)=> {
 			console.log("element")
