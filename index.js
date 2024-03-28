@@ -301,15 +301,15 @@ export default class VideoPlayer extends Component {
 	shouldComponentUpdate = (nextProps, nextState) => {
 		if (this.props.trackingJson !== nextProps.trackingJson  ) {
 			const trackingJson = this.parseTrackingJson(nextProps.trackingJson)
-			// const eventJson = this.parseEventJson(nextProps.trackingJson)
+			const eventJson = this.parseEventJson(nextProps.trackingJson)
 			const adMarkers = this.getAdMarkersData(nextProps.trackingJson)
 			let adMarkerPercent = null
-			console.log("hii", this.state.duration)
+			// console.log("hii", this.state.duration)
 			if(this.state.duration){
-				console.log("hii  222 ", this.state.duration)
+				// console.log("hii  222 ", this.state.duration)
 				adMarkerPercent = this.calculateAdMarkerPosition(this.state.duration, adMarkers)
 			}
-			console.log("hii", adMarkerPercent, adMarkers)
+			// console.log("hii", adMarkerPercent, adMarkers)
 
 			this.setState((prevState)=>({
 				...prevState,
