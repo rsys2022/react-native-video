@@ -1987,17 +1987,30 @@ export default class VideoPlayer extends Component {
 	 * Render the play/pause button and show the respective icon
 	 */
 	renderPlayPause() {
-		let source =
+		if (Platform.isTV || Platform.OS === "web") {
+		  let source = this.state.paused === true ? "play" : "pause";
+		  return (
+			<Button
+			  label={source}
+			  type={"icon"}
+			  onFocus={() => this.resetControlTimeout()}
+			  onSelect={this.methods.togglePlayPause}
+			/>
+		  );
+		} else {
+		  let source =
 			this.state.paused === true
-				? require('./assets/img/play.png')
-				: require('./assets/img/pause.png');
-		return this.renderControl(
+			  ? require("./assets/img/play.png")
+			  : require("./assets/img/pause.png");
+		  return this.renderControl(
 			<Image source={source} />,
 			this.methods.togglePlayPause,
 			styles.controls.playPause,
 			"play"
-		);
-	}
+		  );
+		}
+	  }
+	
 
 	/**
 	 * Render our title...if supplied.
@@ -2215,67 +2228,79 @@ export default class VideoPlayer extends Component {
 					{/* {this.props.control && this.renderBottomControls()} */}
 					{this.toggelNativeAdControls()}
 					{this.showCompanionAd()}
-					{isWider ? this.state.actionSheet && 
-						<SubtitlesModal
-       			 			isModalVisible={this.state.actionSheet}
-							setIsModalVisible={(isModal)=> this.setState({ actionSheet: isModal })}
-							setSubtitles={(subT)=>console.log(subT)}
-							audioTracks={this.state.audioTracks}
-							textTracks={this.state.textTracks}
-							videoTracks={this.state.videoTracks}
-							selectedTextTrack={this.state.selectedTextTrack}
-							selectedAudioTrack={this.state.selectedAudioTrack}
-							selectedVideoTrack={this.state.selectedVideoTracks}
-							videoBitrate={this.state.bitRateSelected}
-							onAudioTracksChange={(item) => this._onChangeAudio(item)}
-							isFullScreen={this.props.fullscreen}
-							onTextTracksChange={(item) => this._onChangeText(item)}
-							onVideoTrackChange={(item) => this._onChangeVideoBitrate(item)}
-							onCancel={() => this.setState({ actionSheet: false, setTvFocus: true })}
-							onTextTracksOff={() => this.onTextTracksOff()}
-						/>
-						: 
-							<Modal
-								isVisible={this.state.actionSheet}
-								// animationType=
-								transparent={true}
-								onRequestClose={() => this.setState({ actionSheet: false })}
-								style={{
-									margin: 0,
-									justifyContent: 'flex-end'
-								}}
-							>
-								<TouchableHighlight
-									hasTVPreferredFocus={false}
-									isTVSelectable={false}
-									style={{
-										margin: 0,
-										justifyContent: 'flex-end',
-										flex: 1
-								}} >
-								
-								{this.state.actionSheet ?
-										(<ActionSheets
-											audioTracks={this.state.audioTracks}
-											textTracks={this.state.textTracks}
-											videoTracks={this.state.videoTracks}
-											selectedTextTrack={this.state.selectedTextTrack}
-											selectedAudioTrack={this.state.selectedAudioTrack}
-											selectedVideoTrack={this.state.selectedVideoTracks}
-											videoBitrate={this.state.bitRateSelected}
-											onAudioTracksChange={(item) => this._onChangeAudio(item)}
-											isFullScreen={this.props.fullscreen}
-											onTextTracksChange={(item) => this._onChangeText(item)}
-											onVideoTrackChange={(item) => this._onChangeVideoBitrate(item)}
-											onCancel={() => this.setState({ actionSheet: false, setTvFocus: true })}
-											onTextTracksOff={() => this.onTextTracksOff()}
-										/>)
-										:
-										(<View />)
-								}
-							</TouchableHighlight>
-						</Modal>
-					}
+					{isWider ? (
+              this.state.actionSheet && (
+                <SubtitlesModal
+                  isModalVisible={this.state.actionSheet}
+                  setIsModalVisible={(isModal) =>
+                    this.setState({ actionSheet: isModal })
+                  }
+                  setSubtitles={(subT) => console.log(subT)}
+                  audioTracks={this.state.audioTracks}
+                  textTracks={this.state.textTracks}
+                  videoTracks={this.state.videoTracks}
+                  selectedTextTrack={this.state.selectedTextTrack}
+                  selectedAudioTrack={this.state.selectedAudioTrack}
+                  selectedVideoTrack={this.state.selectedVideoTracks}
+                  videoBitrate={this.state.bitRateSelected}
+                  onAudioTracksChange={(item) => this._onChangeAudio(item)}
+                  isFullScreen={this.props.fullscreen}
+                  onTextTracksChange={(item) => this._onChangeText(item)}
+                  onVideoTrackChange={(item) =>
+                    this._onChangeVideoBitrate(item)
+                  }
+                  onCancel={() =>
+                    this.setState({ actionSheet: false, setTvFocus: true })
+                  }
+                  onTextTracksOff={() => this.onTextTracksOff()}
+                />
+              )
+            ) : (
+              <Modal
+                isVisible={this.state.actionSheet}
+                // animationType=
+                transparent={true}
+                onRequestClose={() => this.setState({ actionSheet: false })}
+                style={{
+                  margin: 0,
+                  justifyContent: "flex-end",
+                }}
+              >
+                <TouchableHighlight
+                  hasTVPreferredFocus={false}
+                  isTVSelectable={false}
+                  style={{
+                    margin: 0,
+                    justifyContent: "flex-end",
+                    flex: 1,
+                  }}
+                >
+                  {this.state.actionSheet ? (
+                    <ActionSheets
+                      audioTracks={this.state.audioTracks}
+                      textTracks={this.state.textTracks}
+                      videoTracks={this.state.videoTracks}
+                      selectedTextTrack={this.state.selectedTextTrack}
+                      selectedAudioTrack={this.state.selectedAudioTrack}
+                      selectedVideoTrack={this.state.selectedVideoTracks}
+                      videoBitrate={this.state.bitRateSelected}
+                      onAudioTracksChange={(item) => this._onChangeAudio(item)}
+                      isFullScreen={this.props.fullscreen}
+                      onTextTracksChange={(item) => this._onChangeText(item)}
+                      onVideoTrackChange={(item) =>
+                        this._onChangeVideoBitrate(item)
+                      }
+                      onCancel={() =>
+                        this.setState({ actionSheet: false, setTvFocus: true })
+                      }
+                      onTextTracksOff={() => this.onTextTracksOff()}
+                    />
+                  ) : (
+                    <View />
+                  )}
+                </TouchableHighlight>
+              </Modal>
+            )}
 				</View>
 			</TouchableHighlight>
 			</SpatialNavigationRoot>
