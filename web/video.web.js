@@ -253,7 +253,7 @@
 
 
 import React, { useState, useRef, useEffect } from "react";
-import "./App.css";
+// import "./App.css";
 import shaka from "shaka-player/dist/shaka-player.ui";
 import "shaka-player/dist/shaka-player.ui";
 import "shaka-player/dist/controls.css";
@@ -534,7 +534,7 @@ function App(props, ref) {
             src={
               volume
                 ? require("./icons/volume_up.png")
-                : require("./icons/mute.png")
+                : require("./icons/mute_up.png")
             }
             width={24}
             height={24}
