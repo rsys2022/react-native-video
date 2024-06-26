@@ -338,12 +338,12 @@ function App(props, ref) {
       setPlayer(player_);
       videoRef.current.addEventListener("loadeddata", (e) => {
         console.log("loaded url", e);
-        props.onLoaded(e);
+        // props.onLoaded(e);
       });
-      const url = props.src
+      const url = "https://10368c5f41df4fb4b0689d2b90e2c7f2.mediatailor.us-west-2.amazonaws.com/v1/session/9a39c1f787063acfe5de4814e922e22605c1572d/single_ad/6fd21c05275845e2bb67f2a3ccac3605/3222cd28d72744cf86b09f568fa77418/dfadea49cd1647be8c684e1002969cad/index.mpd";
         // "https://b6d76811d0c6e6deca3d996b9ed217a8.egress.mediapackage-vod.us-west-2.amazonaws.com/out/v1/04da2d25b1414c18acf71878ef929a6c/9575008819084305a9d3a38026dbd2d2/71952b0df0f549f6b2916701c6d48cf3/index.mpd";
       // "https://e610299fd5864b5483cf4b764a5a2ff0.mediatailor.us-west-2.amazonaws.com/v1/session/9a39c1f787063acfe5de4814e922e22605c1572d/vod_june_24/04da2d25b1414c18acf71878ef929a6c/9575008819084305a9d3a38026dbd2d2/71952b0df0f549f6b2916701c6d48cf3/index.mpd";
-      // "https://10368c5f41df4fb4b0689d2b90e2c7f2.mediatailor.us-west-2.amazonaws.com/v1/session/9a39c1f787063acfe5de4814e922e22605c1572d/single_ad/6fd21c05275845e2bb67f2a3ccac3605/3222cd28d72744cf86b09f568fa77418/dfadea49cd1647be8c684e1002969cad/index.mpd";
+      
       if (url.includes("mediatailor")) {
         const container = controls.getServerSideAdContainer(); //
 
