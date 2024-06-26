@@ -280,7 +280,7 @@ function App(props, ref) {
         this.button_ = document.createElement("button");
         this.icon = document.createElement("img");
         this.button_.id = "settingButtonId";
-        this.icon.src = require("./icons/settings.png");
+        this.icon.src = require("../icons/settings.png");
         this.icon.width = 20;
         this.icon.height = 20;
         this.button_.appendChild(this.icon);
@@ -533,8 +533,8 @@ function App(props, ref) {
             alt={"volume-img"}
             src={
               volume
-                ? require("./icons/volume_up.png")
-                : require("./icons/mute_up.png")
+                ? require("../icons/volume_up.png")
+                : require("../icons/mute_up.png")
             }
             width={24}
             height={24}
@@ -557,8 +557,8 @@ function App(props, ref) {
             alt={"full-screen-img"}
             src={
               !isFullScreen
-                ? require("./icons/expand.png")
-                : require("./icons/closeFullscreen.png")
+                ? require("../icons/expand.png")
+                : require("../icons/closeFullscreen.png")
             }
             width={24}
             height={24}
@@ -589,7 +589,7 @@ function App(props, ref) {
         <div className="closeContainer">
           <img
             alt="cancel-img"
-            src={require("./icons/cancel.png")}
+            src={require("../icons/cancel.png")}
             width={24}
             height={24}
             id="close-settings"
