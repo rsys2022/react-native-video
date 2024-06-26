@@ -6,7 +6,8 @@ import Video from './video.web';
 // const mpd_asset_id =
 //   'b9ae3db57338421f986cc028c88d1f40/64c179c9a6b04128ab4105d723012382/c2fa5c88342340349588b8dc8a73f0c4/index.mpd';
 
-const App = React.forwardRef((props, ref) => {
+const App = ((props, ref) => {
+  const ref = useRef(null);
   return (
     <div>
       <Video

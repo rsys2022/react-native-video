@@ -252,165 +252,610 @@
  */
 
 
-import React, { useState, useRef, useEffect } from "react";
-// import "./App.css";
+// import React, { useState, useRef, useEffect } from "react";
+// // import "./App.css";
+// import shaka from "shaka-player/dist/shaka-player.ui";
+// import "shaka-player/dist/shaka-player.ui";
+// import "shaka-player/dist/controls.css";
+// import { getAllResolutions, getAllLanguages } from "./utils";
+
+// // md MdSettings
+// function App(props, ref) {
+//   const videoRef = useRef(null);
+//   const videoContainerElementRef = useRef(null);
+//   const [player, setPlayer] = React.useState(null);
+//   const [volume, setVolume] = useState(props.muted ? 0 : 1);
+//   const [ui, setUi] = useState(false);
+//   const [resolutionList, setResolutionList] = useState([]);
+//   const [languageList, setLanguageList] = useState([]);
+//   const [textTrackList, setTextTrackList] = useState([]);
+//   const [isFullScreen, setFullScreenVisibility] = useState(false);
+
+//   const setSettingButton = () => {
+//     const SettingButton = class extends shaka.ui.Element {
+//       constructor(parent, controls) {
+//         super(parent, controls);
+
+//         // The actual button that will be displayed
+//         this.button_ = document.createElement("button");
+//         this.icon = document.createElement("img");
+//         this.button_.id = "settingButtonId";
+//         this.icon.src = require("../icons/settings.png");
+//         this.icon.width = 20;
+//         this.icon.height = 20;
+//         this.button_.appendChild(this.icon);
+//         this.parent.appendChild(this.button_);
+//       }
+//     };
+
+//     SettingButton.Factory = class {
+//       create(rootElement, controls) {
+//         return new SettingButton(rootElement, controls);
+//       }
+//     };
+
+//     shaka.ui.Controls.registerElement(
+//       "setting_menu",
+//       new SettingButton.Factory()
+//     );
+//   };
+
+//   async function initFun() {
+//     if (videoRef.current && videoContainerElementRef.current) {
+//       // When using the UI, the player is made automatically by the UI object.
+//       let video = videoRef.current;
+//       let videoContainerElement = videoContainerElementRef.current;
+
+//       const localPlayer = new shaka.Player();
+
+//       // const ui = video["ui"];
+//       const ui_ = new shaka.ui.Overlay(
+//         localPlayer,
+//         videoContainerElement,
+//         video
+//       );
+
+//       await localPlayer.attach(video);
+
+//       var config = {};
+//       setSettingButton();
+//       config["controlPanelElements"] = [
+//         // "spacer",
+//         // "skip",
+//         // "rewind",
+//         "play_pause",
+//         "spacer",
+//         "setting_menu",
+//         "spacer",
+//         "time_and_duration",
+//       ];
+//       ui_.configure(config);
+
+//       const controls = ui_.getControls();
+
+//       let player_ = controls.getPlayer();
+//       setUi(ui_);
+//       setPlayer(player_);
+//       videoRef.current.addEventListener("loadeddata", (e) => {
+//         console.log("loaded url", e);
+//         // props.onLoaded(e);
+//       });
+//       const url = "https://10368c5f41df4fb4b0689d2b90e2c7f2.mediatailor.us-west-2.amazonaws.com/v1/session/9a39c1f787063acfe5de4814e922e22605c1572d/single_ad/6fd21c05275845e2bb67f2a3ccac3605/3222cd28d72744cf86b09f568fa77418/dfadea49cd1647be8c684e1002969cad/index.mpd";
+//         // "https://b6d76811d0c6e6deca3d996b9ed217a8.egress.mediapackage-vod.us-west-2.amazonaws.com/out/v1/04da2d25b1414c18acf71878ef929a6c/9575008819084305a9d3a38026dbd2d2/71952b0df0f549f6b2916701c6d48cf3/index.mpd";
+//       // "https://e610299fd5864b5483cf4b764a5a2ff0.mediatailor.us-west-2.amazonaws.com/v1/session/9a39c1f787063acfe5de4814e922e22605c1572d/vod_june_24/04da2d25b1414c18acf71878ef929a6c/9575008819084305a9d3a38026dbd2d2/71952b0df0f549f6b2916701c6d48cf3/index.mpd";
+      
+//       if (url.includes("mediatailor")) {
+//         const container = controls.getServerSideAdContainer(); //
+
+//         const netEngine = player_.getNetworkingEngine();
+//         const adManager = player_.getAdManager();
+//         adManager.initMediaTailor(container, netEngine, videoRef.current);
+//         adManager.addEventListener(shaka.ads.AdManager.AD_STARTED, () => {
+//           console.log("AWS Media Tailor: AD_STARTED");
+//           // let val = document.getElementsByClassName("shaka-ad-controls");
+//           // const skipButton = new shaka.ui.SkipAdButton(val[1], controls);
+//           // /**
+//           //  * ttt
+//           //  */
+//           // shaka.ui.Utils.setDisplay(skipButton, false);
+//           // // this.counter_.textContent = "";
+//           // // this.timer_.tickNow();
+//           // // this.timer_.tickEvery(0.5);
+//           // //shaka-ad-controls
+//           // // const skipButton = new shaka.ui.SkipAdButton(val, this);
+//           // // let try = document.getElementsByClassName("shaka-skip-ad-button");
+//           // console.log("try", skipButton);
+//         });
+
+//         adManager.addEventListener(shaka.ads.AdManager.AD_PAUSED, () => {
+//           console.log("AWS Media Tailor: AD_PAUSED");
+//         });
+
+//         adManager.addEventListener(shaka.ads.AdManager.AD_RESUMED, () => {
+//           console.log("AWS Media Tailor: AD_RESUMED");
+//         });
+
+//         adManager.addEventListener(shaka.ads.AdManager.AD_STOPPED, () => {
+//           console.log("AWS Media Tailor: AD_STOPPED");
+//         });
+
+//         const uri = await adManager.requestMediaTailorStream(url);
+//         player_.load(uri);
+//       } else {
+//         player_.load(url);
+//       }
+//     }
+//   }
+
+//   useEffect(() => {
+//     initFun();
+//   }, []);
+
+//   useEffect(() => {
+//     const handleResize = () => {
+//       if (videoContainerElementRef.current) {
+//         const { innerWidth, innerHeight } = window;
+//         videoContainerElementRef.current.style.width = `${innerWidth}px`;
+//         videoContainerElementRef.current.style.height = `${innerHeight}px`;
+//       }
+//     };
+
+//     handleResize();
+
+//     window.addEventListener("resize", handleResize);
+
+//     return () => {
+//       window.removeEventListener("resize", handleResize);
+//     };
+//   }, []);
+
+
+//   // Define a handle for easily referencing Shaka's player & ui API's.
+//   React.useImperativeHandle(
+//     ref,
+//     () => ({
+//       get player() {
+//         return player;
+//       },
+//       get ui() {
+//         return ui;
+//       },
+//       get videoElement() {
+//         return videoRef.current;
+//       },
+//     }),
+//     [player, ui]
+//   );
+  
+
+//   useEffect(() => {
+//     if (document.getElementById("settingButtonId")) {
+//       document
+//         .getElementById("settingButtonId")
+//         .addEventListener("click", (e) => {
+//           const isSettingMenuView =
+//             document.getElementById("setting-menu-view");
+//           isSettingMenuView.style.display =
+//             isSettingMenuView.style.display === "none" ? "flex" : "none";
+//           if (resolutionList.length <= 0) {
+//             let resolutionList = getAllResolutions(player);
+//             setResolutionList(resolutionList);
+//           }
+//           if (languageList.length <= 0) {
+//             let langList = getAllLanguages(player);
+//             setLanguageList(langList);
+//           }
+//           if (textTrackList.length <= 0) {
+//             let captionList = player.getTextTracks();
+//             setTextTrackList(captionList);
+//           }
+//         });
+//     }
+//   }, [player]);
+
+//   function onResolutionSelection(element) {
+//     if (player) {
+//       let pList = player.getVariantTracks();
+//       const prevActiveEl = pList.find((findEl) => findEl.active);
+//       const newActiveEl = pList.find(
+//         (findEl) =>
+//           findEl.height === element.height &&
+//           findEl.language === prevActiveEl.language
+//       );
+//       let updatatedList = resolutionList.map((element) => {
+//         return {
+//           height: element.height,
+//           active: element.height === newActiveEl.height,
+//         };
+//       });
+//       player.configure({ abr: { enabled: false } });
+//       player.selectVariantTrack(newActiveEl, true);
+//       setResolutionList(updatatedList);
+//     }
+//   }
+
+//   function onLanguageSelection(element) {
+//     if (player) {
+//       let pList = player.getVariantTracks();
+//       const prevActiveEl = pList.find((findEl) => findEl.active);
+//       const newActiveEl = pList.find(
+//         (findEl) =>
+//           findEl.height === prevActiveEl.height &&
+//           findEl.language === element.language
+//       );
+//       let updatatedList = languageList.map((element) => {
+//         return {
+//           ...element,
+//           active: element.language === newActiveEl.language,
+//         };
+//       });
+//       player.configure({ abr: { enabled: false } });
+//       player.selectVariantTrack(newActiveEl, true);
+//       setLanguageList(updatatedList);
+//     }
+//   }
+
+//   async function onTextTrackChange(element) {
+//     if (player) {
+//       let captionList = player.getTextTracks();
+//       let updatedCapList = captionList.map((el) => {
+//         return {
+//           ...el,
+//           active: el.language === element.language,
+//         };
+//       });
+//       player.selectTextTrack(element);
+//       setTextTrackList(updatedCapList);
+//       await player.setTextTrackVisibility(true);
+//     }
+//   }
+
+//   return (
+//     <div
+//       ref={videoContainerElementRef}
+//       data-shaka-player-container
+//       data-shaka-player-cast-receiver-id="07AEE832"
+//       id="container"
+//     >
+//       <video 
+//         data-shaka-player
+//         id="video"
+//         ref={videoRef}
+//         height={"100%"}
+//         style={{ width: "100%", height: "100%" }}
+//         onError={(error)=> console.log("video errt", error)}
+//         controls={false}
+//         autoPlay={true} 
+//       />
+//       <div id="up-conatiner" className="upper-controls display-flex">
+//         <div />
+//         <div className="header-container">
+//           <img
+//             alt={"volume-img"}
+//             src={
+//               volume
+//                 ? require("../icons/volume_up.png")
+//                 : require("../icons/mute_up.png")
+//             }
+//             width={24}
+//             height={24}
+//             style={{ tintColor: "white" }}
+//             className="vol-img"
+//           />
+//           <input
+//             type="range"
+//             className="slider-vol"
+//             min={0}
+//             max={1}
+//             step={0.02}
+//             value={volume}
+//             onChange={(event) => {
+//               videoRef.current.volume = event.target.valueAsNumber;
+//               setVolume(event.target.valueAsNumber);
+//             }}
+//           />
+//           <img
+//             alt={"full-screen-img"}
+//             src={
+//               !isFullScreen
+//                 ? require("../icons/expand.png")
+//                 : require("../icons/closeFullscreen.png")
+//             }
+//             width={24}
+//             height={24}
+//             className="expand-img"
+//             onClick={async () => {
+//               if (ui) {
+//                 if (document.fullscreenElement == null) {
+//                   const fullScreenElement =
+//                     ui.getConfiguration().fullScreenElement;
+//                   await fullScreenElement.requestFullscreen({
+//                     navigationUI: "hide",
+//                   });
+//                   setFullScreenVisibility(true);
+//                 } else {
+//                   await document.exitFullscreen();
+//                   setFullScreenVisibility(false);
+//                 }
+//               }
+//             }}
+//           />
+//         </div>
+//       </div>
+//       <div
+//         id="setting-menu-view"
+//         className="setting-menu-container"
+//         style={{ display: "none" }}
+//       >
+//         <div className="closeContainer">
+//           <img
+//             alt="cancel-img"
+//             src={require("../icons/cancel.png")}
+//             width={24}
+//             height={24}
+//             id="close-settings"
+//             onClick={() => {
+//               document.getElementById("setting-menu-view").style.display =
+//                 "none";
+//             }}
+//           />
+//         </div>
+//         <div id="language">
+//           <span className="setting-menu-label">Audio Language</span>
+//           <ul>
+//             {languageList.length > 0 &&
+//               languageList.map((element, index) => {
+//                 return (
+//                   <li
+//                     key={`${element.language}`}
+//                     onClick={() => onLanguageSelection(element)}
+//                     className={`resoltution-item ${
+//                       element.active
+//                         ? "resoltution-active"
+//                         : "resoltution-inactive"
+//                     }`}
+//                     id={`li-${element.language}`}
+//                   >
+//                     {`${element.label}`}
+//                   </li>
+//                 );
+//               })}
+//           </ul>
+//         </div>
+//         <div id="text-tracks">
+//           <span className="setting-menu-label">Subtitle</span>
+//           <ul>
+//             {textTrackList.length > 0 &&
+//               textTrackList.map((element, index) => {
+//                 return (
+//                   <li
+//                     key={`${element.label}`}
+//                     onClick={() => onTextTrackChange(element)}
+//                     className={`resoltution-item ${
+//                       element.active
+//                         ? "resoltution-active"
+//                         : "resoltution-inactive"
+//                     }`}
+//                     id={`li-${element.language}`}
+//                   >
+//                     {`${element.label}`}
+//                   </li>
+//                 );
+//               })}
+//           </ul>
+//         </div>
+//         <div id="resolution">
+//           <span className="setting-menu-label">Resolutions</span>
+//           <ul>
+//             {resolutionList.length > 0 &&
+//               resolutionList.map((element, index) => {
+//                 return (
+//                   <li
+//                     key={`${index}-${element.height}`}
+//                     onClick={() => onResolutionSelection(element)}
+//                     className={`resoltution-item ${
+//                       element.active
+//                         ? "resoltution-active"
+//                         : "resoltution-inactive"
+//                     }`}
+//                     id={`li-${element.height}`}
+//                   >
+//                     {`${element.height}`}
+//                   </li>
+//                 );
+//               })}
+//           </ul>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default React.forwardRef(App)
+
+
+import React, { useEffect, useRef, useState } from "react";
 import shaka from "shaka-player/dist/shaka-player.ui";
 import "shaka-player/dist/shaka-player.ui";
-import "shaka-player/dist/controls.css";
+import "shaka-player/dist/controls.css"; 
+import "./video.css";
 import { getAllResolutions, getAllLanguages } from "./utils";
 
-// md MdSettings
-function App(props, ref) {
+function VidApp({controls_= true , ...props}, ref) {
   const videoRef = useRef(null);
   const videoContainerElementRef = useRef(null);
-  const [player, setPlayer] = React.useState(null);
-  const [volume, setVolume] = useState(props.muted ? 0 : 1);
-  const [ui, setUi] = useState(false);
+  const [player, setPlayer] = useState(null);
+  const [ui, setUi] = useState(null);
   const [resolutionList, setResolutionList] = useState([]);
   const [languageList, setLanguageList] = useState([]);
   const [textTrackList, setTextTrackList] = useState([]);
   const [isFullScreen, setFullScreenVisibility] = useState(false);
+  const [volume, setVolume] = useState(1);
 
   const setSettingButton = () => {
     const SettingButton = class extends shaka.ui.Element {
       constructor(parent, controls) {
         super(parent, controls);
+            let button_ = document.createElement("button");
+            let icon = document.createElement("img");
+            button_.id = "settingButtonId";
+            icon.src = require("../icons/settings.png");
+            icon.width = 20;
+            icon.height = 20;
+            button_.appendChild(icon);
+            parent.appendChild(button_);
+          }
+        };
+    
+        SettingButton.Factory = class {
+          create(rootElement, controls) {
+            return new SettingButton(rootElement, controls);
+          }
+        };
+    
+        shaka.ui.Controls.registerElement(
+          "setting_menu",
+          new SettingButton.Factory()
+        );
+      };
 
-        // The actual button that will be displayed
-        this.button_ = document.createElement("button");
-        this.icon = document.createElement("img");
-        this.button_.id = "settingButtonId";
-        this.icon.src = require("../icons/settings.png");
-        this.icon.width = 20;
-        this.icon.height = 20;
-        this.button_.appendChild(this.icon);
-        this.parent.appendChild(this.button_);
-      }
-    };
 
-    SettingButton.Factory = class {
-      create(rootElement, controls) {
-        return new SettingButton(rootElement, controls);
-      }
-    };
-
-    shaka.ui.Controls.registerElement(
-      "setting_menu",
-      new SettingButton.Factory()
-    );
-  };
 
   async function initFun() {
-    if (videoRef.current && videoContainerElementRef.current) {
-      // When using the UI, the player is made automatically by the UI object.
-      let video = videoRef.current;
-      let videoContainerElement = videoContainerElementRef.current;
+    // When using the UI, the player is made automatically by the UI object.
+    let video =videoRef.current;
+    let videoContainerElement = videoContainerElementRef.current;
+    // const ui = video["ui"];
 
-      const localPlayer = new shaka.Player();
+    const localPlayer = new shaka.Player();
 
-      // const ui = video["ui"];
-      const ui_ = new shaka.ui.Overlay(
-        localPlayer,
-        videoContainerElement,
-        video
-      );
+    // const ui = video["ui"];
+    const ui_ = new shaka.ui.Overlay(localPlayer, videoContainerElement, video);
 
-      await localPlayer.attach(video);
+    await localPlayer.attach(video);
 
-      var config = {};
+    var config = {};
+    console.log("props.controls",controls_)
+    if (controls_ ) {
       setSettingButton();
-      config["controlPanelElements"] = [
-        // "spacer",
-        // "skip",
-        // "rewind",
-        "play_pause",
-        "spacer",
-        "setting_menu",
-        "spacer",
-        "time_and_duration",
-      ];
-      ui_.configure(config);
-
-      const controls = ui_.getControls();
-
-      let player_ = controls.getPlayer();
-      setUi(ui_);
-      setPlayer(player_);
-      videoRef.current.addEventListener("loadeddata", (e) => {
-        console.log("loaded url", e);
-        // props.onLoaded(e);
-      });
-      const url = "https://10368c5f41df4fb4b0689d2b90e2c7f2.mediatailor.us-west-2.amazonaws.com/v1/session/9a39c1f787063acfe5de4814e922e22605c1572d/single_ad/6fd21c05275845e2bb67f2a3ccac3605/3222cd28d72744cf86b09f568fa77418/dfadea49cd1647be8c684e1002969cad/index.mpd";
-        // "https://b6d76811d0c6e6deca3d996b9ed217a8.egress.mediapackage-vod.us-west-2.amazonaws.com/out/v1/04da2d25b1414c18acf71878ef929a6c/9575008819084305a9d3a38026dbd2d2/71952b0df0f549f6b2916701c6d48cf3/index.mpd";
-      // "https://e610299fd5864b5483cf4b764a5a2ff0.mediatailor.us-west-2.amazonaws.com/v1/session/9a39c1f787063acfe5de4814e922e22605c1572d/vod_june_24/04da2d25b1414c18acf71878ef929a6c/9575008819084305a9d3a38026dbd2d2/71952b0df0f549f6b2916701c6d48cf3/index.mpd";
-      
-      if (url.includes("mediatailor")) {
-        const container = controls.getServerSideAdContainer(); //
-
-        const netEngine = player_.getNetworkingEngine();
-        const adManager = player_.getAdManager();
-        adManager.initMediaTailor(container, netEngine, videoRef.current);
-        adManager.addEventListener(shaka.ads.AdManager.AD_STARTED, () => {
-          console.log("AWS Media Tailor: AD_STARTED");
-          // let val = document.getElementsByClassName("shaka-ad-controls");
-          // const skipButton = new shaka.ui.SkipAdButton(val[1], controls);
-          // /**
-          //  * ttt
-          //  */
-          // shaka.ui.Utils.setDisplay(skipButton, false);
-          // // this.counter_.textContent = "";
-          // // this.timer_.tickNow();
-          // // this.timer_.tickEvery(0.5);
-          // //shaka-ad-controls
-          // // const skipButton = new shaka.ui.SkipAdButton(val, this);
-          // // let try = document.getElementsByClassName("shaka-skip-ad-button");
-          // console.log("try", skipButton);
-        });
-
-        adManager.addEventListener(shaka.ads.AdManager.AD_PAUSED, () => {
-          console.log("AWS Media Tailor: AD_PAUSED");
-        });
-
-        adManager.addEventListener(shaka.ads.AdManager.AD_RESUMED, () => {
-          console.log("AWS Media Tailor: AD_RESUMED");
-        });
-
-        adManager.addEventListener(shaka.ads.AdManager.AD_STOPPED, () => {
-          console.log("AWS Media Tailor: AD_STOPPED");
-        });
-
-        const uri = await adManager.requestMediaTailorStream(url);
-        player_.load(uri);
-      } else {
-        player_.load(url);
-      }
     }
+    config["controlPanelElements"] = [
+      // "spacer",
+      // "skip",
+      // "rewind",
+      "play_pause",
+      "spacer",
+      "setting_menu",
+      "spacer",
+      "time_and_duration",
+    ];
+    ui_.configure(config);
+    /*
+      basic to get controls of an ui by shaka based on data-shaka-player mentioned
+      in the video tag.
+      Check ui > Control.js inside shaka-player
+    */
+    const controls = ui_.getControls();
+
+      if (!controls_) {
+        var videoContainerQuery = document.getElementsByClassName("shaka-controls-container");
+        console.log("videoContainerQuery",videoContainerQuery.shown, videoContainerElementRef.current)
+        // videoContainerQuery.setAttribute("shaka-controls", "false");
+      }
+    /*
+      getServerSideAdContainer()
+      Adds a container for server side ad UI
+      Check ui > Control.js inside shaka-player
+    */
+    const container = controls.getServerSideAdContainer(); //
+    /**
+     * getPlayer() will be populated with various function mentioned in Player Class. inside Lib
+     * Initialized with getControls in ui > Control.js and CastProxy.js
+     */
+    const player_ = controls.getPlayer();
+    /**
+     * While initializing the player (inside player constructor in Lib > player.js) a function
+     * called createNetworkingEngine (shaka.net.NetworkingEngine Class) used to handle the actual requests
+     */
+    const netEngine = player_.getNetworkingEngine();
+    /**
+     * adManger in Player  (shaka.Player.adManagerFactory_();) gets initialized while intializing player
+     *
+     */
+    const adManager = player_.getAdManager();
+    /**
+     * adManger in Player  (shaka.Player.adManagerFactory_();) gets initialized while intializing player
+     * shaka.ads.MediaTailorAdManager gets initialized. and create event listners after that.
+     *
+     */
+    videoRef.current.addEventListener("loadeddata", (e) => {
+        console.log("loaded url", e);
+        props.onLoaded(e);
+    });
+    adManager.initMediaTailor(container, netEngine, videoRef.current);
+
+    adManager.addEventListener(shaka.ads.AdManager.AD_STARTED, () => {
+      console.log("AWS Media Tailor: AD_STARTED");
+    });
+
+    adManager.addEventListener(shaka.ads.AdManager.AD_PAUSED, () => {
+      console.log("AWS Media Tailor: AD_PAUSED");
+    });
+
+    adManager.addEventListener(shaka.ads.AdManager.AD_RESUMED, () => {
+      console.log("AWS Media Tailor: AD_RESUMED");
+    });
+
+    adManager.addEventListener(shaka.ads.AdManager.AD_STOPPED, () => {
+      console.log("AWS Media Tailor: AD_STOPPED");
+    });
+
+    const mediaTailorUrl =
+      "https://10368c5f41df4fb4b0689d2b90e2c7f2.mediatailor.us-west-2.amazonaws.com/v1/session/9a39c1f787063acfe5de4814e922e22605c1572d/single_ad/6fd21c05275845e2bb67f2a3ccac3605/3222cd28d72744cf86b09f568fa77418/dfadea49cd1647be8c684e1002969cad/index.mpd";
+
+    /**
+     * requestMediaTailorStream() calls the streamManager() > requestSessionInfo_() inside shaka.ads.MediaTailorAdManager.
+     * In this session url gets requested, inresponse we get 2 urls in return
+     * 1. manifest Url
+     * 2. tracking Url
+     *
+     * Tracking url is saved in a variable with in the class.
+     * Whenever the manifest gets updated this tracking url is requested to fetch tracking json ( this.requestTrackingInfo_() )
+     * after fetching the tracking json it creates a array with request time and events this.adBreaks_ and computes everytime in onTimeUpdate()
+     *
+     * Manifest url is also saved in a variable with in the class and get returned as uri,
+     * which we then pass to player to load that uri.
+     *
+     *
+     * load() function of the player initialize a preloadmanager class which is used to set things bfore loading an uri, i.e configuration like abr, drm, get start time
+     * or duration of  video using presentationTimeline attribute and calls the start function to parse the manifest.
+     * If it gives zero means live manfest othervise its vod
+     */
+    setPlayer(player_)
+    setUi(ui_)
+    const uri = await adManager.requestMediaTailorStream(mediaTailorUrl);
+    // debugger;
+    /*
+     * load() function of the player initialize a preloadmanager class which is used to set things bfore loading an uri,
+     * i.e configuration like abr, drm, get start time, video type : mpd, hls, ss and intitate respective parser class.
+     * or duration of  video using presentationTimeline attribute and calls the start function to parse the manifest.
+     * presentationTimeline - If it gives zero means live manfest othervise its vod.
+     * IN CASE OF DASH : shaka.dash.DashParser is initiated from manifest parser.
+     *                   this.parser_.start() function is called from preloadmanager() i.e the start() inside shaka.dash.DashParser
+     *                   this function calls requestManifest() which makes mpd request over network.
+     *                   and also setTimer in case of updatePeriod value is greater or equal to 0.
+     *                   UpdatePeriod (attribute) - this.updatePeriod_ =
+     *                                                (TXml.parseAttr(mpd, "minimumUpdatePeriod", TXml.parseDuration, -1) );
+     *                   based on update period and the update time (average time taken to request manifest) shaka initiate timer and after the timer over it again call onUpdate function and fetch for manifest again
+     *
+     *
+     * (to find how onManifestUpdate is called map the playerInterface method in player.js > preloadPlayer.js > dashParser.js file)
+     *
+     */
+    player_.load(uri);
+    
   }
 
-  useEffect(() => {
-    initFun();
-  }, []);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (videoContainerElementRef.current) {
-        const { innerWidth, innerHeight } = window;
-        videoContainerElementRef.current.style.width = `${innerWidth}px`;
-        videoContainerElementRef.current.style.height = `${innerHeight}px`;
-      }
-    };
-
-    handleResize();
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-
-  // Define a handle for easily referencing Shaka's player & ui API's.
   React.useImperativeHandle(
     ref,
     () => ({
@@ -424,17 +869,41 @@ function App(props, ref) {
         return videoRef.current;
       },
     }),
-    [player, ui]
+    [player, ui,videoRef.current ]
   );
-  
+
+  useEffect(() => {
+    // document.addEventListener("shaka-ui-loaded", initFun);
+    initFun();
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (videoContainerElementRef.current) {
+        const { innerWidth, innerHeight } = window;
+        videoContainerElementRef.current.style.width = `${innerWidth}px`;
+        videoContainerElementRef.current.style.height = `${innerHeight}px`;
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+
+
 
   useEffect(() => {
     if (document.getElementById("settingButtonId")) {
       document
         .getElementById("settingButtonId")
         .addEventListener("click", (e) => {
+          console.log("click :::", )
           const isSettingMenuView =
             document.getElementById("setting-menu-view");
+            console.log("click :::", isSettingMenuView)
           isSettingMenuView.style.display =
             isSettingMenuView.style.display === "none" ? "flex" : "none";
           if (resolutionList.length <= 0) {
@@ -443,6 +912,7 @@ function App(props, ref) {
           }
           if (languageList.length <= 0) {
             let langList = getAllLanguages(player);
+            console.log("langList :+++: ", langList)
             setLanguageList(langList);
           }
           if (textTrackList.length <= 0) {
@@ -513,20 +983,22 @@ function App(props, ref) {
   return (
     <div
       ref={videoContainerElementRef}
+      id="container"
       data-shaka-player-container
       data-shaka-player-cast-receiver-id="07AEE832"
-      id="container"
     >
-      <video 
+      <video
         data-shaka-player
         id="video"
         ref={videoRef}
-        height={"100%"}
         style={{ width: "100%", height: "100%" }}
-        onError={(error)=> console.log("video errt", error)}
-        autoPlay={props.autoPlay} 
+        onError={(error)=> console.log("error")}
+        autoPlay={true}
+        // controls = {false}
       />
-      <div id="up-conatiner" className="upper-controls display-flex">
+      {
+        controls_ &&
+        <div id="up-conatiner" className="upper-controls display-flex">
         <div />
         <div className="header-container">
           <img
@@ -581,6 +1053,8 @@ function App(props, ref) {
           />
         </div>
       </div>
+      }
+     {controls_ && 
       <div
         id="setting-menu-view"
         className="setting-menu-container"
@@ -621,28 +1095,32 @@ function App(props, ref) {
               })}
           </ul>
         </div>
-        <div id="text-tracks">
-          <span className="setting-menu-label">Subtitle</span>
-          <ul>
-            {textTrackList.length > 0 &&
-              textTrackList.map((element, index) => {
-                return (
-                  <li
-                    key={`${element.label}`}
-                    onClick={() => onTextTrackChange(element)}
-                    className={`resoltution-item ${
-                      element.active
-                        ? "resoltution-active"
-                        : "resoltution-inactive"
-                    }`}
-                    id={`li-${element.language}`}
-                  >
-                    {`${element.label}`}
-                  </li>
-                );
-              })}
-          </ul>
-        </div>
+        {textTrackList.length > 0 &&
+          (
+            <div id="text-tracks">
+              <span className="setting-menu-label">Subtitle</span>
+              <ul>
+                {
+                  textTrackList.map((element, index) => {
+                    return (
+                      <li
+                        key={`${element.label}`}
+                        onClick={() => onTextTrackChange(element)}
+                        className={`resoltution-item ${
+                          element.active
+                            ? "resoltution-active"
+                            : "resoltution-inactive"
+                        }`}
+                        id={`li-${element.language}`}
+                      >
+                        {`${element.label}`}
+                      </li>
+                    );
+                  })}
+              </ul>
+            </div>
+          )
+        }
         <div id="resolution">
           <span className="setting-menu-label">Resolutions</span>
           <ul>
@@ -665,9 +1143,9 @@ function App(props, ref) {
               })}
           </ul>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }
 
-export default React.forwardRef(App)
+export default React.forwardRef(VidApp)
