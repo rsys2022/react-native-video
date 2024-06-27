@@ -758,9 +758,11 @@ function VidApp({controls_= true , ...props}, ref) {
     const controls = ui_.getControls();
 
       if (!controls_) {
-        var videoContainerQuery = document.getElementsByClassName("shaka-controls-container");
-        console.log("videoContainerQuery",videoContainerQuery.shown, videoContainerElementRef.current)
+        // var videoContainerQuery = document.getElementsByClassName("shaka-controls-container");
+        // console.log("videoContainerQuery",videoContainerQuery.shown, videoContainerElementRef.current)
         // videoContainerQuery.setAttribute("shaka-controls", "false");
+        var videoContainerQuery = document.querySelector(".video-cont");
+        videoContainerQuery.setAttribute("shaka-controls", "false");
       }
     /*
       getServerSideAdContainer()
@@ -984,6 +986,7 @@ function VidApp({controls_= true , ...props}, ref) {
     <div
       ref={videoContainerElementRef}
       id="container"
+      className="video-cont"
       data-shaka-player-container
       data-shaka-player-cast-receiver-id="07AEE832"
     >
