@@ -6,7 +6,7 @@ import Video from './video.web';
 // const mpd_asset_id =
 //   'b9ae3db57338421f986cc028c88d1f40/64c179c9a6b04128ab4105d723012382/c2fa5c88342340349588b8dc8a73f0c4/index.mpd';
 
-const App = ((props, ref) => {
+const App = props => {
   const ref = useRef(null);
   return (
     <div>
@@ -14,7 +14,7 @@ const App = ((props, ref) => {
         chromeless={true}
         autoPlay={true}
         src={props.source.uri}
-        controls={props.control}
+        controls_={props.control}
         ref={ref}
         muted={true}
         onLoaded={(e) => {
@@ -48,6 +48,6 @@ const App = ((props, ref) => {
       />
     </div>
   );
-});
+};
 
 export default App;
