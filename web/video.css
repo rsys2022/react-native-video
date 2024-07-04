@@ -188,3 +188,10 @@
     background-color: red;
   }
   
+  .shaka-ad-controls {
+    display: flex;
+    flex-direction: row;
+    z-index: 1;
+    padding-bottom: 1%;
+    justify-content: space-between;
+  }

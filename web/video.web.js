@@ -735,7 +735,6 @@ function VidApp({controls_= true , ...props}, ref) {
     await localPlayer.attach(video);
 
     var config = {};
-    console.log("props.controls",controls_)
     if (controls_ ) {
       setSettingButton();
     }
@@ -905,7 +904,6 @@ function VidApp({controls_= true , ...props}, ref) {
           console.log("click :::", )
           const isSettingMenuView =
             document.getElementById("setting-menu-view");
-            console.log("click :::", isSettingMenuView)
           isSettingMenuView.style.display =
             isSettingMenuView.style.display === "none" ? "flex" : "none";
           if (resolutionList.length <= 0) {
@@ -914,7 +912,6 @@ function VidApp({controls_= true , ...props}, ref) {
           }
           if (languageList.length <= 0) {
             let langList = getAllLanguages(player);
-            console.log("langList :+++: ", langList)
             setLanguageList(langList);
           }
           if (textTrackList.length <= 0) {
@@ -1076,28 +1073,32 @@ function VidApp({controls_= true , ...props}, ref) {
             }}
           />
         </div>
-        <div id="language">
-          <span className="setting-menu-label">Audio Language</span>
-          <ul>
-            {languageList.length > 0 &&
-              languageList.map((element, index) => {
-                return (
-                  <li
-                    key={`${element.language}`}
-                    onClick={() => onLanguageSelection(element)}
-                    className={`resoltution-item ${
-                      element.active
-                        ? "resoltution-active"
-                        : "resoltution-inactive"
-                    }`}
-                    id={`li-${element.language}`}
-                  >
-                    {`${element.label}`}
-                  </li>
-                );
-              })}
-          </ul>
-        </div>
+        {languageList.length > 0 &&
+          (  
+            <div id="language">
+              <span className="setting-menu-label">Audio Language</span>
+              <ul>
+                {languageList.length > 0 &&
+                  languageList.map((element, index) => {
+                    return (
+                      <li
+                        key={`${element.language}`}
+                        onClick={() => onLanguageSelection(element)}
+                        className={`resoltution-item ${
+                          element.active
+                            ? "resoltution-active"
+                            : "resoltution-inactive"
+                        }`}
+                        id={`li-${element.language}`}
+                      >
+                        {`${element.label}`}
+                      </li>
+                    );
+                  })}
+              </ul>
+            </div>
+          )
+        } 
         {textTrackList.length > 0 &&
           (
             <div id="text-tracks">
