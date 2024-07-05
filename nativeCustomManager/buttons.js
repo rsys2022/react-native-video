@@ -1,6 +1,7 @@
 
 import { Animated,} from 'react-native';
 import {
+  SpatialNavigationFocusableView,
   SpatialNavigationNode,
   useSpatialNavigatorFocusableAccessibilityProps,
 } from 'react-tv-space-navigation';
@@ -32,11 +33,11 @@ ButtonContent.displayName = 'ButtonContent';
 
 export const Button = ({ label, onSelect, type }) => {
     return (
-      <SpatialNavigationNode orientation='horizontal' isFocusable={true} onSelect={onSelect}>
+      <SpatialNavigationFocusableView onSelect={onSelect}>
         {({ isFocused }) => (
           <ButtonContent label={label} isFocused={isFocused} type={type} />
         )}
-      </SpatialNavigationNode>
+      </SpatialNavigationFocusableView>
     );
 };
 

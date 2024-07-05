@@ -763,97 +763,111 @@ function VidApp({controls_= true , ...props}, ref) {
         var videoContainerQuery = document.querySelector(".video-cont");
         videoContainerQuery.setAttribute("shaka-controls", "false");
       }
-    /*
-      getServerSideAdContainer()
-      Adds a container for server side ad UI
-      Check ui > Control.js inside shaka-player
-    */
-    const container = controls.getServerSideAdContainer(); //
-    /**
-     * getPlayer() will be populated with various function mentioned in Player Class. inside Lib
-     * Initialized with getControls in ui > Control.js and CastProxy.js
-     */
-    const player_ = controls.getPlayer();
-    /**
-     * While initializing the player (inside player constructor in Lib > player.js) a function
-     * called createNetworkingEngine (shaka.net.NetworkingEngine Class) used to handle the actual requests
-     */
-    const netEngine = player_.getNetworkingEngine();
-    /**
-     * adManger in Player  (shaka.Player.adManagerFactory_();) gets initialized while intializing player
-     *
-     */
-    const adManager = player_.getAdManager();
-    /**
-     * adManger in Player  (shaka.Player.adManagerFactory_();) gets initialized while intializing player
-     * shaka.ads.MediaTailorAdManager gets initialized. and create event listners after that.
-     *
-     */
-    videoRef.current.addEventListener("loadeddata", (e) => {
-        console.log("loaded url", e);
-        props.onLoaded(e);
-    });
-    adManager.initMediaTailor(container, netEngine, videoRef.current);
 
-    adManager.addEventListener(shaka.ads.AdManager.AD_STARTED, () => {
-      console.log("AWS Media Tailor: AD_STARTED");
-    });
-
-    adManager.addEventListener(shaka.ads.AdManager.AD_PAUSED, () => {
-      console.log("AWS Media Tailor: AD_PAUSED");
-    });
-
-    adManager.addEventListener(shaka.ads.AdManager.AD_RESUMED, () => {
-      console.log("AWS Media Tailor: AD_RESUMED");
-    });
-
-    adManager.addEventListener(shaka.ads.AdManager.AD_STOPPED, () => {
-      console.log("AWS Media Tailor: AD_STOPPED");
-    });
-
-    const mediaTailorUrl =
-      "https://10368c5f41df4fb4b0689d2b90e2c7f2.mediatailor.us-west-2.amazonaws.com/v1/session/9a39c1f787063acfe5de4814e922e22605c1572d/single_ad/6fd21c05275845e2bb67f2a3ccac3605/3222cd28d72744cf86b09f568fa77418/dfadea49cd1647be8c684e1002969cad/index.mpd";
-
-    /**
-     * requestMediaTailorStream() calls the streamManager() > requestSessionInfo_() inside shaka.ads.MediaTailorAdManager.
-     * In this session url gets requested, inresponse we get 2 urls in return
-     * 1. manifest Url
-     * 2. tracking Url
-     *
-     * Tracking url is saved in a variable with in the class.
-     * Whenever the manifest gets updated this tracking url is requested to fetch tracking json ( this.requestTrackingInfo_() )
-     * after fetching the tracking json it creates a array with request time and events this.adBreaks_ and computes everytime in onTimeUpdate()
-     *
-     * Manifest url is also saved in a variable with in the class and get returned as uri,
-     * which we then pass to player to load that uri.
-     *
-     *
-     * load() function of the player initialize a preloadmanager class which is used to set things bfore loading an uri, i.e configuration like abr, drm, get start time
-     * or duration of  video using presentationTimeline attribute and calls the start function to parse the manifest.
-     * If it gives zero means live manfest othervise its vod
-     */
-    setPlayer(player_)
-    setUi(ui_)
-    const uri = await adManager.requestMediaTailorStream(mediaTailorUrl);
-    // debugger;
-    /*
-     * load() function of the player initialize a preloadmanager class which is used to set things bfore loading an uri,
-     * i.e configuration like abr, drm, get start time, video type : mpd, hls, ss and intitate respective parser class.
-     * or duration of  video using presentationTimeline attribute and calls the start function to parse the manifest.
-     * presentationTimeline - If it gives zero means live manfest othervise its vod.
-     * IN CASE OF DASH : shaka.dash.DashParser is initiated from manifest parser.
-     *                   this.parser_.start() function is called from preloadmanager() i.e the start() inside shaka.dash.DashParser
-     *                   this function calls requestManifest() which makes mpd request over network.
-     *                   and also setTimer in case of updatePeriod value is greater or equal to 0.
-     *                   UpdatePeriod (attribute) - this.updatePeriod_ =
-     *                                                (TXml.parseAttr(mpd, "minimumUpdatePeriod", TXml.parseDuration, -1) );
-     *                   based on update period and the update time (average time taken to request manifest) shaka initiate timer and after the timer over it again call onUpdate function and fetch for manifest again
-     *
-     *
-     * (to find how onManifestUpdate is called map the playerInterface method in player.js > preloadPlayer.js > dashParser.js file)
-     *
-     */
-    player_.load(uri);
+    if(props.src.includes("mediatailor")){
+      /*
+        getServerSideAdContainer()
+        Adds a container for server side ad UI
+        Check ui > Control.js inside shaka-player
+      */
+      const container = controls.getServerSideAdContainer(); //
+      /**
+       * getPlayer() will be populated with various function mentioned in Player Class. inside Lib
+       * Initialized with getControls in ui > Control.js and CastProxy.js
+       */
+      const player_ = controls.getPlayer();
+      /**
+       * While initializing the player (inside player constructor in Lib > player.js) a function
+       * called createNetworkingEngine (shaka.net.NetworkingEngine Class) used to handle the actual requests
+       */
+      const netEngine = player_.getNetworkingEngine();
+      /**
+       * adManger in Player  (shaka.Player.adManagerFactory_();) gets initialized while intializing player
+       *
+       */
+      const adManager = player_.getAdManager();
+      /**
+       * adManger in Player  (shaka.Player.adManagerFactory_();) gets initialized while intializing player
+       * shaka.ads.MediaTailorAdManager gets initialized. and create event listners after that.
+       *
+       */
+      videoRef.current.addEventListener("loadeddata", (e) => {
+          console.log("loaded url", e);
+          props.onLoaded(e);
+      });
+      adManager.initMediaTailor(container, netEngine, videoRef.current);
+  
+      adManager.addEventListener(shaka.ads.AdManager.AD_STARTED, () => {
+        console.log("AWS Media Tailor: AD_STARTED");
+      });
+  
+      adManager.addEventListener(shaka.ads.AdManager.AD_PAUSED, () => {
+        console.log("AWS Media Tailor: AD_PAUSED");
+      });
+  
+      adManager.addEventListener(shaka.ads.AdManager.AD_RESUMED, () => {
+        console.log("AWS Media Tailor: AD_RESUMED");
+      });
+  
+      adManager.addEventListener(shaka.ads.AdManager.AD_STOPPED, () => {
+        console.log("AWS Media Tailor: AD_STOPPED");
+      });
+  
+      const mediaTailorUrl = props.src
+        // "https://10368c5f41df4fb4b0689d2b90e2c7f2.mediatailor.us-west-2.amazonaws.com/v1/session/9a39c1f787063acfe5de4814e922e22605c1572d/single_ad/6fd21c05275845e2bb67f2a3ccac3605/3222cd28d72744cf86b09f568fa77418/dfadea49cd1647be8c684e1002969cad/index.mpd";
+  
+      /**
+       * requestMediaTailorStream() calls the streamManager() > requestSessionInfo_() inside shaka.ads.MediaTailorAdManager.
+       * In this session url gets requested, inresponse we get 2 urls in return
+       * 1. manifest Url
+       * 2. tracking Url
+       *
+       * Tracking url is saved in a variable with in the class.
+       * Whenever the manifest gets updated this tracking url is requested to fetch tracking json ( this.requestTrackingInfo_() )
+       * after fetching the tracking json it creates a array with request time and events this.adBreaks_ and computes everytime in onTimeUpdate()
+       *
+       * Manifest url is also saved in a variable with in the class and get returned as uri,
+       * which we then pass to player to load that uri.
+       *
+       *
+       * load() function of the player initialize a preloadmanager class which is used to set things bfore loading an uri, i.e configuration like abr, drm, get start time
+       * or duration of  video using presentationTimeline attribute and calls the start function to parse the manifest.
+       * If it gives zero means live manfest othervise its vod
+       */
+      setPlayer(player_)
+      setUi(ui_)
+      const uri = await adManager.requestMediaTailorStream(mediaTailorUrl);
+      // debugger;
+      /*
+       * load() function of the player initialize a preloadmanager class which is used to set things bfore loading an uri,
+       * i.e configuration like abr, drm, get start time, video type : mpd, hls, ss and intitate respective parser class.
+       * or duration of  video using presentationTimeline attribute and calls the start function to parse the manifest.
+       * presentationTimeline - If it gives zero means live manfest othervise its vod.
+       * IN CASE OF DASH : shaka.dash.DashParser is initiated from manifest parser.
+       *                   this.parser_.start() function is called from preloadmanager() i.e the start() inside shaka.dash.DashParser
+       *                   this function calls requestManifest() which makes mpd request over network.
+       *                   and also setTimer in case of updatePeriod value is greater or equal to 0.
+       *                   UpdatePeriod (attribute) - this.updatePeriod_ =
+       *                                                (TXml.parseAttr(mpd, "minimumUpdatePeriod", TXml.parseDuration, -1) );
+       *                   based on update period and the update time (average time taken to request manifest) shaka initiate timer and after the timer over it again call onUpdate function and fetch for manifest again
+       *
+       *
+       * (to find how onManifestUpdate is called map the playerInterface method in player.js > preloadPlayer.js > dashParser.js file)
+       *
+       */
+      player_.load(uri);
+      
+    } else {
+      setPlayer(localPlayer)
+      setUi(ui_)
+      localPlayer
+        .load(props.src)
+        .then(function () {
+          // This runs if the asynchronous load is successful.
+          console.log("The video has now been loaded!");
+        })
+        .catch(onError);
+    }
     
   }
 
