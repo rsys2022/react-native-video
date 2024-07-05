@@ -866,7 +866,9 @@ function VidApp({controls_= true , ...props}, ref) {
           // This runs if the asynchronous load is successful.
           console.log("The video has now been loaded!");
         })
-        .catch(onError);
+        .catch(error => {
+          console.log("error :::: ", error)
+        });
     }
     
   }
