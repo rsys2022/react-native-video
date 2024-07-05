@@ -799,6 +799,8 @@ function VidApp({controls_= true , ...props}, ref) {
   
       adManager.addEventListener(shaka.ads.AdManager.AD_STARTED, () => {
         console.log("AWS Media Tailor: AD_STARTED");
+        const settingId = document.getElementById("settingButtonId");
+        settingId.style.display = "none";
       });
   
       adManager.addEventListener(shaka.ads.AdManager.AD_PAUSED, () => {
@@ -811,6 +813,8 @@ function VidApp({controls_= true , ...props}, ref) {
   
       adManager.addEventListener(shaka.ads.AdManager.AD_STOPPED, () => {
         console.log("AWS Media Tailor: AD_STOPPED");
+        const settingId = document.getElementById("settingButtonId");
+        settingId.style.display = "flex";
       });
   
       const mediaTailorUrl = props.src
