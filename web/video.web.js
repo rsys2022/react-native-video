@@ -936,7 +936,15 @@ function VidApp({controls_= true , ...props}, ref) {
           }
           if (textTrackList.length <= 0) {
             let captionList = player.getTextTracks();
-            setTextTrackList(captionList);
+            console.log("captionList :: ", captionList);
+            const uniqueList = captionList.reduce((unique, o) => {
+              if(!unique.some(obj => obj.language === o.language)) {
+                unique.push(o);
+              }
+              return unique;
+             },[]);
+             console.log("uniqueList :: ", uniqueList);
+            setTextTrackList(uniqueList);
           }
         });
     }
@@ -987,7 +995,13 @@ function VidApp({controls_= true , ...props}, ref) {
   async function onTextTrackChange(element) {
     if (player) {
       let captionList = player.getTextTracks();
-      let updatedCapList = captionList.map((el) => {
+      const uniqueList = captionList.reduce((unique, o) => {
+        if(!unique.some(obj => obj.language === o.language)) {
+          unique.push(o);
+        }
+        return unique;
+       },[]);
+      let updatedCapList = uniqueList.map((el) => {
         return {
           ...el,
           active: el.language === element.language,
@@ -1111,7 +1125,7 @@ function VidApp({controls_= true , ...props}, ref) {
                         }`}
                         id={`li-${element.language}`}
                       >
-                        {`${element.label}`}
+                       {`${element.label ? element.label : element.language}`}
                       </li>
                     );
                   })}
@@ -1137,7 +1151,7 @@ function VidApp({controls_= true , ...props}, ref) {
                         }`}
                         id={`li-${element.language}`}
                       >
-                        {`${element.label}`}
+                        {`${element.label ? element.label : element.language}`}
                       </li>
                     );
                   })}
