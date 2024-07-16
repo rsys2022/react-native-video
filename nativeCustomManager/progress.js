@@ -1,6 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, Image, SafeAreaView, Platform } from 'react-native';
 import { FocusButton } from 'react-native-tv-selected-focus';
+import { DefaultFocus, SpatialNavigationNode, SpatialNavigationView } from 'react-tv-space-navigation';
+import { gray } from '../../../src/helper/Color';
+import { Button } from 'react-native-video/nativeCustomManager/buttons';
+import { SkipButton } from 'react-native-video/nativeCustomManager/skipButton';
 
 function convertTimeTot(totalSeconds) {
   const tSec = parseInt(totalSeconds);
@@ -24,7 +28,8 @@ export const PercentageBar = ({
   adDuration,
   setTvFocus
 }) => {
-  let source = isPaused ? require('../assets/img/play.png') : require('../assets/img/pause.png')
+  // let source = isPaused ? require('../assets/img/play.png') : require('../assets/img/pause.png')
+  let source = isPaused ? "play" : "pause";
 
   return (
     <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
@@ -51,8 +56,32 @@ export const PercentageBar = ({
           />
         </View>
       </View>
+     
+      {Platform.isTV?
+        <SpatialNavigationView style={[controls.row, controls.bottomControlGroup]} direction="horizontal">
+      <Button
+      label={source}
+      type={"icon"}
+      onSelect={() => playPauseCall(!isPaused)}
+    />
+        <View style={{ flexDirection: "row", justifyContent: "space-between", ...controls.control }}>
+          <Text style={controls.timerText}>{convertTimeTot(adDuration)}</Text>
+          {showSkip ?
+<DefaultFocus>
+  <View style={{ marginLeft: 10,marginTop:-5 }}>
+  <SkipButton
+label={'Skip'}
+type={"label"}
+onSelect={() =>  onSkipPress()}
+/>
+  </View>
+
+</DefaultFocus>:null}
+        </View>
+        </SpatialNavigationView>
+      :
       <SafeAreaView style={[controls.row, controls.bottomControlGroup]}>
-        <FocusButton
+    <FocusButton
           hasTVPreferredFocus={true}
           isTVSelectable={setTvFocus}
           tvParallaxProperties={{
@@ -73,8 +102,7 @@ export const PercentageBar = ({
         </FocusButton>
         <View style={{ flexDirection: "row", justifyContent: "space-between", ...controls.control }}>
           <Text style={controls.timerText}>{convertTimeTot(adDuration)}</Text>
-          {showSkip ?
-            <FocusButton
+          {showSkip ?<FocusButton
               isTVSelectable={setTvFocus}
               tvParallaxProperties={{
                 enabled: true,
@@ -94,7 +122,7 @@ export const PercentageBar = ({
             </FocusButton>
             : null}
         </View>
-      </SafeAreaView>
+      </SafeAreaView>}
     </View>
   );
 };

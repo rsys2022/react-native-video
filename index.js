@@ -26,9 +26,10 @@ import ActionSheets from './nativeCustomManager/actionSheet';
 import { PercentageBar } from 'react-native-video/nativeCustomManager/progress';
 import { FocusButton } from 'react-native-tv-selected-focus';
 import { VolumeManager } from 'react-native-volume-manager';
-import { useLockSpatialNavigation, SpatialNavigationNode, SpatialNavigationRoot, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
+import { useLockSpatialNavigation, SpatialNavigationNode, SpatialNavigationRoot, SpatialNavigationScrollView, SpatialNavigationView, DefaultFocus } from 'react-tv-space-navigation';
 import { Button } from 'react-native-video/nativeCustomManager/buttons';
 import { SubtitlesModal } from 'react-native-video/nativeCustomManager/modals/SubtitlesModal';
+import { AddSkipModal } from 'react-native-video/nativeCustomManager/modals/addProgressBarModal';
 // const { lock, unlock } = useLockSpatialNavigation();
 const isWider=Platform.isTV || Platform.OS==='web';
 
@@ -40,7 +41,7 @@ export default class VideoPlayer extends Component {
 		playInBackground: false,
 		playWhenInactive: false,
 		resizeMode: 'contain',
-		isFullscreen: true,
+		isFullscreen: false,
 		showOnStart: true,
 		paused: false,
 		repeat: false,
@@ -72,7 +73,7 @@ export default class VideoPlayer extends Component {
 			// Controls
 
 			isFullscreen:
-				this.props.isFullScreen || this.props.resizeMode === 'cover' || true,
+				this.props.isFullScreen,
 			showTimeRemaining: this.props.showTimeRemaining,
 			showHours: this.props.showHours,
 			volumeTrackWidth: 0,
@@ -115,9 +116,11 @@ export default class VideoPlayer extends Component {
 			isBuffering: false,
 			forwardBackwardCount: 0,
 			fastForwardBackwardPosition: 0,
-			adCompanionData: null
+			adCompanionData: null,
+			isModalVisible: false,//for add control
 		};
 
+    this.setIsModalVisible = this.setIsModalVisible.bind(this);
 		/**
 		 * Any options that can be set at init.
 		 */
@@ -212,6 +215,12 @@ export default class VideoPlayer extends Component {
 		this.volumeListener = null
 	}
 
+
+	setIsModalVisible(isVisible) {
+		let state = this.state;
+		state.isModalVisible=isVisible;
+		this.setState(state);
+	  }
 	lockSpatialNavigation() {
 		// const { lock } = useLockSpatialNavigation();
 		// lock();
@@ -575,8 +584,9 @@ export default class VideoPlayer extends Component {
 				if (!this.state.isAdVisible) {
 					// this.setState({isAdVisible: true})
 					state.isAdVisible = true
+
 					state.controls = false
-					
+					state.isModalVisible=true
 					// console.log("timeObj[time].start", timeObj[time].start, this.state.isAdVisible)
 					// adDuration = timeObj[time].start + parseInt(timeObj[time].duration)
 				}
@@ -603,6 +613,7 @@ export default class VideoPlayer extends Component {
 				}
 				else {
 					state.isAdVisible = false
+					state.isModalVisible=false
 					state.adDuration = 0
 					state.adBar = 0
 					state.skipTo = 0
@@ -1227,6 +1238,7 @@ export default class VideoPlayer extends Component {
 			this.setState((prevState) => ({
 				...prevState,
 				isAdVisible: false,
+				isModalVisible:false,
 				adDuration: 0,
 				adBar: 0,
 				skipTo: 0,
@@ -1630,7 +1642,10 @@ export default class VideoPlayer extends Component {
 	renderBack() {
 		if(Platform.isTV || Platform.OS==='web'){
 			return(
-				(<Button label={'chevron-left'} type={'icon'}  onFocus={()=>this.resetControlTimeout()} onSelect={this.events.onBack} />)
+				(<Button label={'chevron-left'} type={'icon'}  onFocus={()=>this.resetControlTimeout()} onSelect={()=>{
+					if (this.state.showControls) {
+					this.events.onBack();
+		}}} />)
 			)
 		}
 		return this.renderControl(
@@ -1808,7 +1823,7 @@ export default class VideoPlayer extends Component {
 		
 			return (<SpatialNavigationNode 
 				onFocus={() => { 
-					console.log('SpatialNavigationNode focus')
+					// console.log('SpatialNavigationNode focus')
 					this.setState((prevState)=> ({...prevState ,isSeekbarFocused: true}))
 					this.resetControlTimeout();
 				}}
@@ -1990,12 +2005,14 @@ export default class VideoPlayer extends Component {
 		if (Platform.isTV || Platform.OS === "web") {
 		  let source = this.state.paused === true ? "play" : "pause";
 		  return (
+			<DefaultFocus>
 			<Button
 			  label={source}
 			  type={"icon"}
 			  onFocus={() => this.resetControlTimeout()}
 			  onSelect={this.methods.togglePlayPause}
 			/>
+			</DefaultFocus>
 		  );
 		} else {
 		  let source =
@@ -2094,10 +2111,14 @@ export default class VideoPlayer extends Component {
 			return(
 				(<Button label={'cog'} type={'icon'}
 				onFocus={()=>this.resetControlTimeout()}
-				isFocusable={this.state.setTvFocus}
+				// isFocusable={this.state.setTvFocus}
+				isFocused
 				 onSelect={() => {
-					this.setState({ setTvFocus: false, actionSheet: true })
-					this.resetControlTimeout();
+					if (this.state.showControls) {
+						this.setState({ setTvFocus: false, actionSheet: true })
+						this.resetControlTimeout();
+					}
+				
 				}} />)
 			)
 		}
@@ -2126,22 +2147,44 @@ export default class VideoPlayer extends Component {
 
 	toggelNativeAdControls = () => {
 		if (this.state.isAdVisible === true) {
-			return (
-				<PercentageBar
-					percentage={`${parseInt((this.state.adBar * 100) + 1)}%`}
-					showSkip={this.state.showSkip}
-					adDuration={this.state.adDuration}
-					onSkipPress={() => {
-						this.seekTo(this.state.skipTo + 1)
-					}}
-					initialTime={9000}
-					playPauseCall={(value) => this.setState({ paused: value })}
-					setMuteValue={(value) => console.log(value)}
-					isPaused={this.props.paused || this.state.paused}
-					isMuted={this.props.isMuted}
-					setTvFocus={true}
-				/>
-			)
+			if(Platform.isTV){
+				return (
+					<AddSkipModal
+					isModalVisible={this.state.isModalVisible}
+					setIsModalVisible={this.setIsModalVisible}
+						percentage={`${parseInt((this.state.adBar * 100) + 1)}%`}
+						showSkip={this.state.showSkip}
+						adDuration={this.state.adDuration}
+						onSkipPress={() => {
+							this.seekTo(this.state.skipTo + 1)
+						}}
+						initialTime={9000}
+						playPauseCall={(value) => this.setState({ paused: value })}
+						setMuteValue={(value) => console.log(value)}
+						isPaused={this.props.paused || this.state.paused}
+						isMuted={this.props.isMuted}
+						setTvFocus={true}
+						/>
+				)
+			}else{
+				return (
+					<PercentageBar
+						percentage={`${parseInt((this.state.adBar * 100) + 1)}%`}
+						showSkip={this.state.showSkip}
+						adDuration={this.state.adDuration}
+						onSkipPress={() => {
+							this.seekTo(this.state.skipTo)
+						}}
+						initialTime={9000}
+						playPauseCall={(value) => this.setState({ paused: value })}
+						setMuteValue={(value) => console.log(value)}
+						isPaused={this.props.paused || this.state.paused}
+						isMuted={this.props.isMuted}
+						setTvFocus={true}
+					/>
+				)
+			}
+			
 		} else if (this.state.controls === true) {
 			return this.renderBottomControls()
 		} else {
@@ -2186,12 +2229,11 @@ export default class VideoPlayer extends Component {
 		return (
 			<SpatialNavigationRoot>
 			<TouchableHighlight
-				// hasTVPreferredFocus={this.state.showControls ? false : this.state.actionSheet ? false : true}
-				// isTVSelectable={this.state.showControls ? false : this.state.actionSheet ? false : true}
-				// hasTVPreferredFocus={this.state.showControls ? false : this.state.actionSheet ? false : this.state.isAdVisible ? false : true}
-				// isTVSelectable={this.state.showControls ? false : this.state.actionSheet ? false : this.state.isAdVisible ? false : true}
-				hasTVPreferredFocus={this.state.showControls ? false : (this.state.actionSheet ? false : this.state.isAdVisible ? false : true) || (this.state.isSeekbarFocused ? false : true)}
-				isTVSelectable={this.state.showControls ? false : (this.state.actionSheet ? false : this.state.isAdVisible ? false : true) || (this.state.isSeekbarFocused ? false : true)}
+				hasTVPreferredFocus={true}
+				isTVSelectable={true}
+			
+				// hasTVPreferredFocus={this.state.showControls ? false : (this.state.actionSheet ? false : this.state.isAdVisible ? false : true) || (this.state.isSeekbarFocused ? false : true)}
+				// isTVSelectable={this.state.showControls ? false : (this.state.actionSheet ? false : this.state.isAdVisible ? false : true) || (this.state.isSeekbarFocused ? false : true)}
 
 				onPress={this.events.onScreenTouch}
 				style={[styles.player.container, this.styles.containerStyle]}>

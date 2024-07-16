@@ -1,11 +1,10 @@
 import { useEffect } from 'react';
-import { Button } from 'react-native-video/nativeCustomManager/buttons';  //'../Button';
 // import { Spacer } from '../../design-system/components/Spacer';
 import { GenericModal } from './GenericModal';
 import { useIsFirstRender } from './useIsFirstRender';
 import { SpatialNavigationRoot, useLockSpatialNavigation, DefaultFocus } from 'react-tv-space-navigation';
 import React from 'react';
-import ActionSheet from 'react-native-video/nativeCustomManager/actionSheet';
+import ActionSheet from '../actionSheet';
 
 interface SubtitlesModalProps {
   isModalVisible: boolean;

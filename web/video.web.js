@@ -761,10 +761,12 @@ function VidApp({controls_= true , ...props}, ref) {
         // console.log("videoContainerQuery",videoContainerQuery.shown, videoContainerElementRef.current)
         // videoContainerQuery.setAttribute("shaka-controls", "false");
         var videoContainerQuery = document.querySelector(".video-cont");
-        videoContainerQuery.setAttribute("shaka-controls", "false");
+        if(videoContainerQuery){
+          videoContainerQuery.setAttribute("shaka-controls", "false");
+        }
       }
 
-    if(props.src.includes("mediatailor")){
+    if(props && props?.src && props.src.includes("mediatailor")){
       /*
         getServerSideAdContainer()
         Adds a container for server side ad UI
@@ -936,13 +938,19 @@ function VidApp({controls_= true , ...props}, ref) {
           }
           if (textTrackList.length <= 0) {
             let captionList = player.getTextTracks();
-            console.log("captionList :: ", captionList);
+            // console.log("captionList :: ", captionList);
             const uniqueList = captionList.reduce((unique, o) => {
               if(!unique.some(obj => obj.language === o.language)) {
                 unique.push(o);
               }
               return unique;
              },[]);
+             let defaultSelected = {
+              language: "Off",
+              label: "Off",
+              active: true,
+             }
+             uniqueList.unshift(defaultSelected)
              console.log("uniqueList :: ", uniqueList);
             setTextTrackList(uniqueList);
           }
@@ -994,6 +1002,31 @@ function VidApp({controls_= true , ...props}, ref) {
 
   async function onTextTrackChange(element) {
     if (player) {
+      if(element.label === "Off"){
+        await player.setTextTrackVisibility(false)
+        let captionList = player.getTextTracks();
+        const uniqueList = captionList.reduce((unique, o) => {
+          if(!unique.some(obj => obj.language === o.language)) {
+            unique.push(o);
+          }
+          return unique;
+         },[]);
+        let updatedCapList = uniqueList.map((el) => {
+          return {
+            ...el,
+            active: el.language === element.language,
+          };
+        });
+        player.selectTextTrack(element);
+        let defaultSelected = {
+          language: "Off",
+          label: "Off",
+          active: true,
+         }
+         updatedCapList.unshift(defaultSelected)
+        setTextTrackList(updatedCapList);
+        return;
+      }
       let captionList = player.getTextTracks();
       const uniqueList = captionList.reduce((unique, o) => {
         if(!unique.some(obj => obj.language === o.language)) {
@@ -1008,6 +1041,12 @@ function VidApp({controls_= true , ...props}, ref) {
         };
       });
       player.selectTextTrack(element);
+      let defaultSelected = {
+        language: "Off",
+        label: "Off",
+        active: false,
+       }
+       updatedCapList.unshift(defaultSelected)
       setTextTrackList(updatedCapList);
       await player.setTextTrackVisibility(true);
     }
@@ -1133,7 +1172,7 @@ function VidApp({controls_= true , ...props}, ref) {
             </div>
           )
         } 
-        {textTrackList.length > 0 &&
+        {textTrackList.length > 1 &&
           (
             <div id="text-tracks">
               <span className="setting-menu-label">Subtitle</span>

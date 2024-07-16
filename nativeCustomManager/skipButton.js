@@ -31,7 +31,7 @@ const ButtonContent = (props) => {
 
 ButtonContent.displayName = 'ButtonContent';
 
-export const Button = ({ label, onSelect, type }) => {
+export const SkipButton = ({ label, onSelect, type }) => {
     return (
       <SpatialNavigationFocusableView isFocusable onSelect={onSelect}>
         {({ isFocused }) => (
@@ -43,8 +43,9 @@ export const Button = ({ label, onSelect, type }) => {
 
 const Container = styled(Animated.View)(({ isFocused }) => ({
   alignSelf: 'baseline',
-  backgroundColor: isFocused ? 'white' : 'transparent',
-  padding: 5,
+  backgroundColor: isFocused ? 'white' : 'gray',
+  paddingHorizontal: 5,
+  paddingVertical:2,
   borderRadius: 10,
 }));
 
