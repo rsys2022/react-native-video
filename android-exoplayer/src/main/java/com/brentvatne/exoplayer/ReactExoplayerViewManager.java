@@ -71,9 +71,9 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
     private static final String PROP_HIDE_SHUTTER_VIEW = "hideShutterView";
     private static final String PROP_CONTROLS = "controls";
 
-    private static final String PROP_TRACKING_JSON = "trackingJson";
+    // private static final String PROP_TRACKING_JSON = "trackingJson";
 
-    private static final String PROP_EVENT_TRACKING_JSON = "eventTracking";
+    // private static final String PROP_EVENT_TRACKING_JSON = "eventTracking";
 
     private ReactExoplayerConfig config;
 
@@ -318,15 +318,15 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
         videoView.setControls(controls);
     }
 
-    @ReactProp(name = PROP_TRACKING_JSON)
-    public void setTrackingJson(final ReactExoplayerView videoView,  @Nullable ReadableMap trackingJson) {
-        videoView.setTrackingJsonModifier(trackingJson);
-    }
+    // @ReactProp(name = PROP_TRACKING_JSON)
+    // public void setTrackingJson(final ReactExoplayerView videoView,  @Nullable ReadableMap trackingJson) {
+    //     videoView.setTrackingJsonModifier(trackingJson);
+    // }
 
-    @ReactProp(name = PROP_EVENT_TRACKING_JSON)
-    public void setEventTrackingJson(final ReactExoplayerView videoView,  @Nullable ReadableMap trackingJson) {
-        videoView.setEventTrackingJsonModifier(trackingJson);
-    }
+    // @ReactProp(name = PROP_EVENT_TRACKING_JSON)
+    // public void setEventTrackingJson(final ReactExoplayerView videoView,  @Nullable ReadableMap trackingJson) {
+    //     videoView.setEventTrackingJsonModifier(trackingJson);
+    // }
 
     @ReactProp(name = PROP_BUFFER_CONFIG)
     public void setBufferConfig(final ReactExoplayerView videoView, @Nullable ReadableMap bufferConfig) {

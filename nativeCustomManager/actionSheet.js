@@ -1415,13 +1415,17 @@ import { checkArrayAndElements, ImageIcon, normalize } from '../assets/Icon/icon
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
 import FontIstoIcon from 'react-native-vector-icons/Fontisto'
-import { FocusButton } from 'react-native-tv-selected-focus';
+import { FocusButton, FocusText } from 'react-native-tv-selected-focus';
 import { gray } from '../../../src/helper/Color';
 import { FlatList } from 'react-native-gesture-handler';
+import { DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationRoot, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { Button } from 'react-native-video/nativeCustomManager/buttons';;
 
 const WHITE = '#ffffff';
 const BORDER_COLOR = '#DBDBDB';
 const {heigh, width} = Dimensions.get("window")
+const isWider=Platform.isTV || Platform.OS==='web'
 
 const ActionSheet = (props) => {
     const { 
@@ -1462,12 +1466,12 @@ const ActionSheet = (props) => {
             data: videoTracks ? [...videoTracks] : []
         }
     ])
-
+    // console.log("textTracks :: +++ :: ", textTracks)
     // const [selectedSettingType, setSelectedSettingType] = useState(0)
     // const [currentSelectedVal, setCurrentSelectedVal] = useState(null)
     const [textWidths, setTextWidth] = useState([])
     const [isCloseSelected, setIsCloseSelected] = useState(false)
-
+    const isFocused = useIsFocused();
 
     function setSelectedValue(data, sectionName){
         switch (sectionName) {
@@ -1487,13 +1491,15 @@ const ActionSheet = (props) => {
     }
 
     function updateVals(section, item){
+      
+        //  console.log('updateVals----',selectedTextTrack.language , item[section.dataAttr])
         switch (section.title) {
-           
+
             case "Audio Language":
-                return selectedAudioTrack.value === item[section.dataAttr]
+                return Platform.OS==='web'?selectedAudioTrack.language === item[section.dataAttr]: selectedAudioTrack.value === item[section.dataAttr]
                 break;
             case "Subtitles":
-                return selectedTextTrack.value === item[section.dataAttr]
+                return Platform.OS==='web'?selectedTextTrack.language === item[section.dataAttr]: selectedTextTrack.value === item[section.dataAttr]
                 break;
             case "Resolutions":
                 if(selectedVideoTrack === undefined && item[section.dataAttr] === "Auto"){
@@ -1513,7 +1519,7 @@ const ActionSheet = (props) => {
         <View style={{
             ...styles.modalContent, 
             height:  Platform.isTV || isFullScreen ? "100%" : "40%", 
-            width:  Platform.isTV || isFullScreen ? "40%" : "100%",
+            width:  Platform.isTV || isFullScreen ? "35%" : "100%",
             alignSelf: "flex-end"
             }}>
             {/* <View 
@@ -1534,7 +1540,7 @@ const ActionSheet = (props) => {
                     
                 }}> */}
                 <View style={{width: "100%",}} >
-                    <FocusButton
+                  { !isWider ? <FocusButton
                         // key={index}
                         tvParallaxProperties={{
                             enabled: true,
@@ -1545,6 +1551,7 @@ const ActionSheet = (props) => {
                         isTVSelectable={true}
                         onFocus={() => {
                             setIsCloseSelected(true)
+                           
                         }}
                         onBlur={() => {
                             setIsCloseSelected(false)
@@ -1557,7 +1564,15 @@ const ActionSheet = (props) => {
                         onPress={onCancel}
                     >
                         <AntDesign name={"closecircle"} size={isCloseSelected ? 25: 20} style={{marginRight: 40, }} color="white" />
-                    </FocusButton>
+                    </FocusButton>:
+                   
+                        <View style={{flexDirection: "row", width: "99%",  marginTop: 10,  justifyContent: "flex-end" }}>
+                             <DefaultFocus>
+                        <Button isFocusable={true} onSelect={onCancel} label={Platform.OS==='web'?'times':'times-circle'} type='icon' />
+                        {/* 'times-circle' */}
+                        </DefaultFocus>
+                        </View>}
+                  
                 </View>
                 {
                     Platform.isTV  || isFullScreen ? 
@@ -1581,32 +1596,52 @@ const ActionSheet = (props) => {
                                 let isSelected = updateVals(section, item)
 
                                 // const isSelected = selectedTextTrack === item[section.dataAttr] ? 
-                                return(
-                                    <FocusButton
-                                    tvParallaxProperties={{
-                                        enabled: true,
-                                        magnification: 1.05,
-                                    }}
-                                    hasTVPreferredFocus={false}
-
-                                    onlyText={true}
-                                    isTVSelectable={true}
-                                    onFocus={() => {}}
-                                    underlayColor={gray}
-                                    // style={{flexDirection: "row",  marginBottom: 5, width: "100%", paddingLeft: 15}}
-                                    activeOpacity={0.4}
-                                    // style={{ marginBottom: 5}}
-                                    // animatedStyle={{ width: "20%"}}
-                                    onPress={() => 
-                                        {
+                                if(isWider){
+                                    return(
+                                        <SpatialNavigationFocusableView isFocusable onSelect={()=>{
                                             setSelectedValue(item, section.title)
                                             // setCurrentSelectedVal(item[section.dataAttr])
+                                            }}>
+                                        {({ isFocused }) => 
+                                        <View style={{paddingHorizontal: 20, paddingVertical: 8,backgroundColor:isFocused?'white':'black'}}>
+                                       <Text style={{color: isSelected  ? "#4682B4": isFocused?'black':'white', fontFamily: 'Montserrat-Medium', justifyContent: "center", fontSize: normalize(1.6), marginLeft: 5, alignItems: "center"}}>
+                                        {item[section.dataAttr]}
+                                       </Text>
+                                       </View>
                                         }
-                                    }
-                                    style={{paddingHorizontal: 20, paddingVertical: 8}}>
-                                        <Text style={{color: isSelected ? "#4682B4": "white", fontFamily: 'Montserrat-Medium', justifyContent: "center", fontSize: normalize(1.6), marginLeft: 5, alignItems: "center"}}>{item[section.dataAttr]}</Text>
-                                    </FocusButton>
-                            )}}
+                                      </SpatialNavigationFocusableView>
+                                    )
+                                } 
+
+                                return(
+                                    <FocusText
+                                        tvParallaxProperties={{
+                                            enabled: true,
+                                            magnification: 1.05,
+                                        }}
+                                        hasTVPreferredFocus={false}
+
+                                        onlyText={true}
+                                        isTVSelectable={true}
+                                        onFocus={() => {}}
+                                        underlayColor={gray}
+                                        // style={{flexDirection: "row",  marginBottom: 5, width: "100%", paddingLeft: 15}}
+                                        activeOpacity={0.4}
+                                        // style={{ marginBottom: 5}}
+                                        // animatedStyle={{ width: "20%"}}
+                                        onPress={() => 
+                                            {
+                                                setSelectedValue(item, section.title)
+                                                // setCurrentSelectedVal(item[section.dataAttr])
+                                            }
+                                        }
+                                        value={item[section.dataAttr]}
+                                        containerStyle={{paddingHorizontal: 20, paddingVertical: 8, width : 90}}
+                                        textStyle={{color: isSelected ? "#4682B4": "white", fontFamily: 'Montserrat-Medium', justifyContent: "center", fontSize: normalize(1.6), marginLeft: 5, alignItems: "center"}}
+                                    />
+                                  
+                            )
+                        }}
                             renderSectionHeader={({section: {title}}) => (
                                 <View style={{backgroundColor: "#1F456E", padding: 10}}>
                                     <Text style={{ fontWeight: "700"  , color: 'white', fontFamily: 'Montserrat-Medium', justifyContent: "center", fontSize: normalize(1.6), marginLeft: 5, alignItems: "center" }}>{title}</Text>
@@ -1957,8 +1992,34 @@ const ActionSheet = (props) => {
                 </View> */}
 
             </View>
-        // </View>
         )
+// console.log('Action sheet isFocused---',isFocused)
+//     return(
+        
+//         <SpatialNavigationScrollView  horizontal={true} style={{
+//             ...styles.modalContent, 
+//             height:  Platform.isTV || isFullScreen ? "100%" : "40%", 
+//             width:  Platform.isTV || isFullScreen ? "40%" : "100%",
+//             alignSelf: "flex-end"
+//             }} offsetFromStart={10}>
+// <SpatialNavigationFocusableView isFocusable={true}>
+// {({ isFocused }) => <Text style={{ color: isFocused ? 'red' : 'black' }}>Hello World!</Text>}
+// </SpatialNavigationFocusableView>
+// <SpatialNavigationFocusableView isFocusable={true}>
+// {({ isFocused }) => <Text style={{ color: isFocused ? 'red' : 'black' }}>Hello World!</Text>}
+// </SpatialNavigationFocusableView>
+// <SpatialNavigationFocusableView isFocusable={true}>
+// {({ isFocused }) => <Text style={{ color: isFocused ? 'red' : 'black' }}>Hello World!</Text>}
+// </SpatialNavigationFocusableView>
+// <SpatialNavigationFocusableView isFocusable={true}>
+// {({ isFocused }) => <Text style={{ color: isFocused ? 'red' : 'black' }}>Hello World!</Text>}
+// </SpatialNavigationFocusableView>
+// <Button label='dfv'/>
+// </SpatialNavigationScrollView>
+// </SpatialNavigationRoot>
+    // )
+
+
 }
 
 
@@ -1973,7 +2034,7 @@ const styles = StyleSheet.create({
         // marginRight: 8,
         // marginBottom: 20,
         // height: Platform.isTV ? "100%" : "40%", 
-        backgroundColor: 'rgb(21,24,33)',
+        backgroundColor: '#000000'  //'rgb(21,24,33)',
         // bottom: 0,
         // position: "absolute",
         // bottom: 0,
