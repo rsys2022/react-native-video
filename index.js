@@ -551,7 +551,7 @@ export default class VideoPlayer extends Component {
 		// const currentTime = parseInt(this.state.currentTime > data.currentTime ? this.state.currentTime : data.currentTime);
 		for (const time in timeObj) {
 			if (
-				timeObj[time].start < currentTime &&
+				timeObj[time].start <= currentTime &&
 				currentTime < timeObj[time].end
 			) {
 				// console.log("time" , time,currentTime,  time === currentTime ? "yes" : "")
@@ -1202,17 +1202,16 @@ export default class VideoPlayer extends Component {
 		return this.player.seekerWidth * percent;
 	}
 
-	 calculateAdMarkerPosition =(duration, adMarker = this.state.adMarkers) =>{
-		console.log("this.state.duration", duration, this.state.adMarkers)
+	calculateAdMarkerPosition =(duration, adMarker = this.state.adMarkers) =>{
 		if(adMarker === null || adMarker.length <= 0)
 		{
 			return [];
 		}
 		let adMarkerArray = [...adMarker].map((element)=> {
-			console.log("element")
-			return (element / duration)* 100;
+			return {value: (element.startTimeInSeconds / duration)* 100, 
+				adDuration:  
+				((element.durationInSeconds) / duration)* 100};
 		})
-		console.log("adMarkerArray", adMarkerArray)
 		return [...adMarkerArray]
 	}
 
@@ -1819,11 +1818,10 @@ export default class VideoPlayer extends Component {
 	renderSeekbar() {
 		const {isLive} = this.props
 		const {seekerFillWidth, seekerPosition} = this.state
-		if(Platform.isTV || Platform.OS==='web'){
+		if(Platform.isTV){
 		
 			return (<SpatialNavigationNode 
 				onFocus={() => { 
-					// console.log('SpatialNavigationNode focus')
 					this.setState((prevState)=> ({...prevState ,isSeekbarFocused: true}))
 					this.resetControlTimeout();
 				}}
@@ -1894,9 +1892,9 @@ export default class VideoPlayer extends Component {
 								/>}
 							</View>
 							{
-									 this.state.adMarkerPercent && this.state.adMarkerPercent.map(values => {
+									 this.state.adMarkerPercent && this.state.adMarkerPercent.map((el, indix) => {
 										 return (
-											 <View style={{height: 2.5, width: 2 , backgroundColor: "yellow", left: `${values+1}%`, position: "absolute", zIndex: 1000, top: 13.5,}} />
+											 <View keu={indix} style={{height: 2.5, width: `${el.adDuration}%` , backgroundColor: "yellow", left: `${el.value}%`, position: "absolute", zIndex: 1000, top: 14,}} />
 										 )
 									 })
 								 }
@@ -1986,7 +1984,8 @@ export default class VideoPlayer extends Component {
 						{
 		 						this.state.adMarkerPercent && this.state.adMarkerPercent.map((values, index) => {
 		 							return (
-		 								<View key={index} style={{height: 2.5, width: 2 , backgroundColor: "yellow", left: `${values}%`, position: "absolute", zIndex: 1000, top: 14,}} />
+										 <View key={index} style={{height: 2.5, width: `${el.adDuration}%` , backgroundColor: "yellow", left: `${el.value}%`, position: "absolute", zIndex: 1000, top: 14,}} />
+
 		 							)
 		 						})
 		 					}
