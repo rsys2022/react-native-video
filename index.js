@@ -2228,8 +2228,8 @@ export default class VideoPlayer extends Component {
 		return (
 			<SpatialNavigationRoot>
 			<TouchableHighlight
-				hasTVPreferredFocus={true}
-				isTVSelectable={true}
+				hasTVPreferredFocus={Platform.isTV && Platform.OS === "ios" ? false : true}
+				isTVSelectable={Platform.isTV && Platform.OS === "ios" ? false : true}
 			
 				// hasTVPreferredFocus={this.state.showControls ? false : (this.state.actionSheet ? false : this.state.isAdVisible ? false : true) || (this.state.isSeekbarFocused ? false : true)}
 				// isTVSelectable={this.state.showControls ? false : (this.state.actionSheet ? false : this.state.isAdVisible ? false : true) || (this.state.isSeekbarFocused ? false : true)}
