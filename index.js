@@ -343,7 +343,7 @@ export default class VideoPlayer extends Component {
 		// console.log("trackList sdsds ===>  ", trackList.avails);
 		let adTimeArray = []
 		trackList.avails.map((value)=> {
-			adTimeArray.push(value.startTimeInSeconds)
+			adTimeArray.push({startTimeInSeconds:  value.startTimeInSeconds, durationInSeconds: value.durationInSeconds})
 		})
 		console.log("adTimeArray sdsds ===>  ", adTimeArray);
 
