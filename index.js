@@ -1982,7 +1982,7 @@ export default class VideoPlayer extends Component {
 							/>
 						</View>
 						{
-		 						this.state.adMarkerPercent && this.state.adMarkerPercent.map((values, index) => {
+		 						this.state.adMarkerPercent && this.state.adMarkerPercent.map((el, index) => {
 		 							return (
 										 <View key={index} style={{height: 2.5, width: `${el.adDuration}%` , backgroundColor: "yellow", left: `${el.value}%`, position: "absolute", zIndex: 1000, top: 14,}} />
 
