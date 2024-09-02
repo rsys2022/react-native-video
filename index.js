@@ -1641,10 +1641,19 @@ export default class VideoPlayer extends Component {
 	renderBack() {
 		if(Platform.isTV || Platform.OS==='web'){
 			return(
-				(<Button label={'chevron-left'} type={'icon'}  onFocus={()=>this.resetControlTimeout()} onSelect={()=>{
-					if (this.state.showControls) {
-					this.events.onBack();
-		}}} />)
+				(<DefaultFocus>
+					<Button 
+						label={'chevron-left'} 
+						type={'icon'}  
+						onFocus={()=>this.resetControlTimeout()} 
+						onSelect={()=>{
+							if (this.state.showControls) {
+								this.events.onBack();
+							}}
+						} 
+					/>
+				</DefaultFocus>
+				)
 			)
 		}
 		return this.renderControl(
@@ -1737,8 +1746,11 @@ export default class VideoPlayer extends Component {
 					<SpatialNavigationView style={[styles.controls.row, styles.controls.bottomControlGroup]} direction="horizontal">
 					{/* <SafeAreaView
 						style={[styles.controls.row, styles.controls.bottomControlGroup]}> */}
-						{this.state.showControls ? playPauseControl : (<View style={{ width: 40 }}></View>)}
-						{(checkArrayAndElements(this.state.audioTracks) || checkArrayAndElements(this.state.textTracks)) ? this.settingIcon() : null}
+						<SpatialNavigationNode>
+							{this.state.showControls ? playPauseControl : (<View style={{ width: 40 }}></View>)}
+						</SpatialNavigationNode>
+						{/* {(checkArrayAndElements(this.state.audioTracks) || checkArrayAndElements(this.state.textTracks)) ? this.settingIcon() : null} */}
+						<SpatialNavigationNode>{this.settingIcon()}</SpatialNavigationNode>
 						{this.renderTitle()}
 						{/* {timerControl} */}
 						{
@@ -2004,14 +2016,14 @@ export default class VideoPlayer extends Component {
 		if (Platform.isTV || Platform.OS === "web") {
 		  let source = this.state.paused === true ? "play" : "pause";
 		  return (
-			<DefaultFocus>
+			// <DefaultFocus>
 			<Button
 			  label={source}
 			  type={"icon"}
 			  onFocus={() => this.resetControlTimeout()}
 			  onSelect={this.methods.togglePlayPause}
 			/>
-			</DefaultFocus>
+			// </DefaultFocus>
 		  );
 		} else {
 		  let source =
@@ -2114,8 +2126,19 @@ export default class VideoPlayer extends Component {
 				isFocused
 				 onSelect={() => {
 					if (this.state.showControls) {
-						this.setState({ setTvFocus: false, actionSheet: true })
-						this.resetControlTimeout();
+						if (checkArrayAndElements(this.state.audioTracks) || checkArrayAndElements(this.state.textTracks)) {
+
+							this.setState({ setTvFocus: false, actionSheet: true })
+
+							this.resetControlTimeout();
+
+							
+
+						}else{
+
+							// this.showToast();
+
+						}
 					}
 				
 				}} />)
@@ -2134,7 +2157,11 @@ export default class VideoPlayer extends Component {
 				underlayColor={'transparent'}
 				// onFocus={()=>{}}
 				onPress={() => {
-					this.setState({ setTvFocus: false, actionSheet: true })
+					if (checkArrayAndElements(this.state.audioTracks) || checkArrayAndElements(this.state.textTracks)) {
+						this.setState({ setTvFocus: false, actionSheet: true })
+					}else {
+						// this.showToast();
+					}
 				}}>
 				<Text style={{ color: 'white', fontFamily: 'Montserrat-Medium' }}>
 					<ImageIcon name={'cog'} color={'white'} size={18} />  Settings
@@ -2228,9 +2255,10 @@ export default class VideoPlayer extends Component {
 		return (
 			<SpatialNavigationRoot>
 			<TouchableHighlight
-				hasTVPreferredFocus={Platform.isTV && Platform.OS === "ios" ? false : true}
-				isTVSelectable={Platform.isTV && Platform.OS === "ios" ? false : true}
-			
+				// hasTVPreferredFocus={Platform.isTV && Platform.OS === "ios" ? false : true}
+				// isTVSelectable={Platform.isTV && Platform.OS === "ios" ? false : true}
+				hasTVPreferredFocus={true}
+				isTVSelectable={true}
 				// hasTVPreferredFocus={this.state.showControls ? false : (this.state.actionSheet ? false : this.state.isAdVisible ? false : true) || (this.state.isSeekbarFocused ? false : true)}
 				// isTVSelectable={this.state.showControls ? false : (this.state.actionSheet ? false : this.state.isAdVisible ? false : true) || (this.state.isSeekbarFocused ? false : true)}
 
