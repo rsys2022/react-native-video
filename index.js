@@ -1641,7 +1641,7 @@ export default class VideoPlayer extends Component {
 	renderBack() {
 		if(Platform.isTV || Platform.OS==='web'){
 			return(
-				(<DefaultFocus>
+				
 					<Button 
 						label={'chevron-left'} 
 						type={'icon'}  
@@ -1652,8 +1652,7 @@ export default class VideoPlayer extends Component {
 							}}
 						} 
 					/>
-				</DefaultFocus>
-				)
+				
 			)
 		}
 		return this.renderControl(
