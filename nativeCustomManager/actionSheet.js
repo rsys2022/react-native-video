@@ -307,7 +307,7 @@
 //                     borderBottomRightRadius: 10,
 //                     paddingBottom: 40,
 //                     height: height/2.6, 
-                    
+
 //                 }}>
 //                 <View>
 //                     <Text style={{ color: 'black', alignSelf: "center", fontFamily: 'Montserrat-Medium', fontSize: normalize(1.6), marginVertical: 10 }}>
@@ -410,13 +410,13 @@
 //                            />
 //                             // [...settingList[selectedSettingType].data].map((item, index)=> {
 //                             //  return (
-                                    
+
 //                             //  )
 //                             // })
 //                         }
 //                         </View>
 //                     </View>
-                    
+
 //                 </View>
 
 //                 {/* <View>
@@ -718,7 +718,7 @@
 //                     borderBottomRightRadius: 10,
 //                     paddingBottom: 40,
 //                     height: height/2.6, 
-                    
+
 //                 }}>
 //                 <View>
 //                     <Text style={{ color: 'black', alignSelf: "center", fontFamily: 'Montserrat-Medium', fontSize: normalize(1.6), marginVertical: 10 }}>
@@ -821,13 +821,13 @@
 //                            />
 //                             // [...settingList[selectedSettingType].data].map((item, index)=> {
 //                             //  return (
-                                    
+
 //                             //  )
 //                             // })
 //                         }
 //                         </View>
 //                     </View>
-                    
+
 //                 </View>
 
 //             </View>
@@ -1061,7 +1061,7 @@
 //                     // paddingBottom: 40,
 //                     // height: height/2.6, 
 //                     // height: Platform.isTV ? "100%" : "40%"
-                    
+
 //                 }}>
 //                     <View style={{width: "100%",}} >
 //                     <FocusButton
@@ -1134,7 +1134,7 @@
 //                                 )
 //                         })
 //                     }
-                   
+
 //                     </View>
 //                     <View style={{width: "100%", }}>
 //                     {selectedSettingType !== null &&
@@ -1154,7 +1154,7 @@
 //                                 }
 //                                 return(
 //                                     <FocusButton
-                                        
+
 //                                         // hasTVPreferredFocus={true}
 //                                         tvParallaxProperties={{
 //                                             enabled: true,
@@ -1194,7 +1194,7 @@
 //                     }
 //                     </View>
 
-                   
+
 //                 {/* <View>
 //                     <Text style={{ color: 'black', alignSelf: "center", fontFamily: 'Montserrat-Medium', fontSize: normalize(1.6), marginVertical: 10 }}>
 //                         <FontIstoIcon size={normalize(1.7)} name={'player-settings'} /> Settings
@@ -1296,13 +1296,13 @@
 //                            />
 //                             // [...settingList[selectedSettingType].data].map((item, index)=> {
 //                             //  return (
-                                    
+
 //                             //  )
 //                             // })
 //                         }
 //                         </View>
 //                     </View>
-                    
+
 //                 </View> */}
 
 //             </View>
@@ -1327,7 +1327,7 @@
 //         // position: "absolute",
 //         // bottom: 0,
 
-        
+
 //     },
 
 //     actionSheetText: {
@@ -1409,7 +1409,7 @@
 
 
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View, Dimensions, Platform, SectionList, ScrollView } from 'react-native';
 import { checkArrayAndElements, ImageIcon, normalize } from '../assets/Icon/icon'
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -1424,24 +1424,24 @@ import { Button } from 'react-native-video/nativeCustomManager/buttons';;
 
 const WHITE = '#ffffff';
 const BORDER_COLOR = '#DBDBDB';
-const {heigh, width} = Dimensions.get("window")
-const isWider=Platform.isTV || Platform.OS==='web'
+const { heigh, width } = Dimensions.get("window")
+const isWider = Platform.isTV || Platform.OS === 'web'
 
 const ActionSheet = (props) => {
-    const { 
-        onCancel, 
-        audioTracks, 
-        textTracks, videoTracks, 
-        selectedTextTrack, 
-        selectedAudioTrack, 
-        selectedVideoTrack, 
-        setTvFocus, 
-        onTextTracksChange, 
-        onAudioTracksChange, 
-        onVideoTrackChange, 
-        onTextTracksOff, 
-        videoBitrate, 
-        isFullScreen 
+    const {
+        onCancel,
+        audioTracks,
+        textTracks, videoTracks,
+        selectedTextTrack,
+        selectedAudioTrack,
+        selectedVideoTrack,
+        setTvFocus,
+        onTextTracksChange,
+        onAudioTracksChange,
+        onVideoTrackChange,
+        onTextTracksOff,
+        videoBitrate,
+        isFullScreen
     } = props;
     const [settingList, setSettingList] = useState([
         {
@@ -1473,7 +1473,7 @@ const ActionSheet = (props) => {
     const [isCloseSelected, setIsCloseSelected] = useState(false)
     const isFocused = useIsFocused();
 
-    function setSelectedValue(data, sectionName){
+    function setSelectedValue(data, sectionName) {
         switch (sectionName) {
             case "Audio Language":
                 onAudioTracksChange(data)
@@ -1490,20 +1490,20 @@ const ActionSheet = (props) => {
         }
     }
 
-    function updateVals(section, item){
-      
+    function updateVals(section, item) {
+
         //  console.log('updateVals----',selectedTextTrack.language , item[section.dataAttr])
         switch (section.title) {
 
             case "Audio Language":
-                return Platform.OS==='web'?selectedAudioTrack.language === item[section.dataAttr]: selectedAudioTrack.value === item[section.dataAttr]
+                return Platform.OS === 'web' ? selectedAudioTrack.language === item[section.dataAttr] : selectedAudioTrack.value === item[section.dataAttr]
                 break;
             case "Subtitles":
-                return Platform.OS==='web'?selectedTextTrack.language === item[section.dataAttr]: selectedTextTrack.value === item[section.dataAttr]
+                return Platform.OS === 'web' ? selectedTextTrack.language === item[section.dataAttr] : selectedTextTrack.value === item[section.dataAttr]
                 break;
             case "Resolutions":
-                if(selectedVideoTrack === undefined && item[section.dataAttr] === "Auto"){
-                    return  true
+                if (selectedVideoTrack === undefined && item[section.dataAttr] === "Auto") {
+                    return true
                 } else {
                     return selectedVideoTrack && selectedVideoTrack.value === item[section.dataAttr]
                 }
@@ -1517,11 +1517,11 @@ const ActionSheet = (props) => {
     // console.log("fullscreen" , isFullScreen)
     return (
         <View style={{
-            ...styles.modalContent, 
-            height:  Platform.isTV || isFullScreen ? "100%" : "40%", 
-            width:  Platform.isTV || isFullScreen ? "35%" : "100%",
+            ...styles.modalContent,
+            height: Platform.isTV || isFullScreen ? "100%" : "40%",
+            width: Platform.isTV || isFullScreen ? "35%" : "100%",
             alignSelf: "flex-end"
-            }}>
+        }}>
             {/* <View 
                style={{
                     // paddingHorizontal: '2%',
@@ -1539,82 +1539,149 @@ const ActionSheet = (props) => {
                     // height: Platform.isTV ? "100%" : "40%"
                     
                 }}> */}
-                <View style={{width: "100%",}} >
-                  { !isWider ? <FocusButton
-                        // key={index}
-                        tvParallaxProperties={{
-                            enabled: true,
-                            magnification: 1.05,
-                        }}
-                        hasTVPreferredFocus={true}
-                        // onlyText={true}
-                        isTVSelectable={true}
-                        onFocus={() => {
-                            setIsCloseSelected(true)
-                           
-                        }}
-                        onBlur={() => {
-                            setIsCloseSelected(false)
-                        }}
-                        onlyText={true}
-                        underlayColor={gray}
-                        style={{flexDirection: "row", width: "99%",  marginTop: 10,  justifyContent: "flex-end" }}
-                        activeOpacity={0.4}
-                        // animatedStyle={{ width: "20%"}}
-                        onPress={onCancel}
-                    >
-                        <AntDesign name={"closecircle"} size={isCloseSelected ? 25: 20} style={{marginRight: 40, }} color="white" />
-                    </FocusButton>:
-                   
-                        <View style={{flexDirection: "row", width: "99%",  marginTop: 10,  justifyContent: "flex-end" }}>
-                             <DefaultFocus>
-                        <Button isFocusable={true} onSelect={onCancel} label={Platform.OS==='web'?'times':'times-circle'} type='icon' />
-                        {/* 'times-circle' */}
+            <View style={{ width: "100%", }} >
+                {!isWider ? <FocusButton
+                    // key={index}
+                    tvParallaxProperties={{
+                        enabled: true,
+                        magnification: 1.05,
+                    }}
+                    hasTVPreferredFocus={true}
+                    // onlyText={true}
+                    isTVSelectable={true}
+                    onFocus={() => {
+                        setIsCloseSelected(true)
+
+                    }}
+                    onBlur={() => {
+                        setIsCloseSelected(false)
+                    }}
+                    onlyText={true}
+                    underlayColor={gray}
+                    style={{ flexDirection: "row", width: "99%", marginTop: 10, justifyContent: "flex-end" }}
+                    activeOpacity={0.4}
+                    // animatedStyle={{ width: "20%"}}
+                    onPress={onCancel}
+                >
+                    <AntDesign name={"closecircle"} size={isCloseSelected ? 25 : 20} style={{ marginRight: 40, }} color="white" />
+                </FocusButton> :
+
+                    <View style={{ flexDirection: "row", width: "99%", marginTop: 10, justifyContent: "flex-end" }}>
+                        <DefaultFocus>
+                            <Button isFocusable={true} onSelect={onCancel} label={Platform.OS === 'web' ? 'times' : 'times-circle'} type='icon' />
+                            {/* 'times-circle' */}
                         </DefaultFocus>
-                        </View>}
-                  
-                </View>
-                {
-                    Platform.isTV  || isFullScreen ? 
+                    </View>}
+
+            </View>
+            {
+                Platform.isTV || isFullScreen ?
                     (
-                        <SectionList 
+                        <SpatialNavigationScrollView style={{ backgroundColor: 'black' }} offsetFromStart={120}>
+                            <SectionList
+                                sections={settingList}
+                                scrollEnabled={true}
+                                contentContainerStyle={{ marginBottom: 110, marginTop: 10 }}
+                                keyExtractor={(item, index) => item + index}
+                                renderSectionFooter={({ section }) => {
+                                    if (section.data.length === 0) {
+                                        return (
+                                            <View style={{ paddingHorizontal: 10, paddingVertical: 8 }}>
+                                                <Text>No Data Found</Text>
+                                            </View>
+                                        )
+                                    }
+                                    return null
+                                }}
+                                renderItem={({ item, index, section }) => {
+                                    // console.log("section", section)
+                                    let isSelected = updateVals(section, item)
+
+                                    // const isSelected = selectedTextTrack === item[section.dataAttr] ? 
+                                    if (isWider) {
+                                        return (
+                                            <SpatialNavigationFocusableView isFocusable onSelect={() => {
+                                                setSelectedValue(item, section.title)
+                                                // setCurrentSelectedVal(item[section.dataAttr])
+                                            }}>
+                                                {({ isFocused }) =>
+                                                    <View style={{ paddingHorizontal: 20, paddingVertical: 8, backgroundColor: isFocused ? 'white' : 'black' }}>
+                                                        <Text style={{ color: isSelected ? "#4682B4" : isFocused ? 'black' : 'white', fontFamily: 'Montserrat-Medium', justifyContent: "center", fontSize: normalize(1.4), marginLeft: 5, alignItems: "center" }}>
+                                                            {item[section.dataAttr]}
+                                                        </Text>
+                                                    </View>
+                                                }
+                                            </SpatialNavigationFocusableView>
+                                        )
+                                    }
+
+                                    return (
+                                        <FocusText
+                                            tvParallaxProperties={{
+                                                enabled: true,
+                                                magnification: 1.05,
+                                            }}
+                                            hasTVPreferredFocus={false}
+
+                                            onlyText={true}
+                                            isTVSelectable={true}
+                                            onFocus={() => { }}
+                                            underlayColor={gray}
+                                            // style={{flexDirection: "row",  marginBottom: 5, width: "100%", paddingLeft: 15}}
+                                            activeOpacity={0.4}
+                                            // style={{ marginBottom: 5}}
+                                            // animatedStyle={{ width: "20%"}}
+                                            onPress={() => {
+                                                setSelectedValue(item, section.title)
+                                                // setCurrentSelectedVal(item[section.dataAttr])
+                                            }
+                                            }
+                                            value={item[section.dataAttr]}
+                                            containerStyle={{ paddingHorizontal: 20, paddingVertical: 8, width: 90 }}
+                                            textStyle={{ color: isSelected ? "#4682B4" : "white", fontFamily: 'Montserrat-Medium', justifyContent: "center", fontSize: normalize(1.4), marginLeft: 5, alignItems: "center" }}
+                                        />
+
+                                    )
+                                }}
+                                renderSectionHeader={({ section: { title, data } }) => {
+                                    if (data.length) {
+                                        return (
+                                            <View style={{ backgroundColor: "#1F456E", padding: 10 }}>
+                                                <Text style={{ fontWeight: "700", color: 'white', fontFamily: 'Montserrat-Medium', justifyContent: "center", fontSize: normalize(1.6), marginLeft: 5, alignItems: "center" }}>{title}</Text>
+                                            </View>
+                                        )
+                                    } else {
+                                        return null;
+                                    }
+
+                                }}
+                            />
+                        </SpatialNavigationScrollView>
+                    )
+                    :
+                    (
+                        <SectionList
                             sections={settingList}
                             scrollEnabled={true}
-                            contentContainerStyle={{marginBottom: 110, marginTop: 10}}
+                            contentContainerStyle={{ marginBottom: 110, marginTop: 10 }}
                             keyExtractor={(item, index) => item + index}
-                            renderSectionFooter={({section}) => {
-                                if(section.data.length=== 0){
+                            renderSectionFooter={({ section }) => {
+                                if (section.data.length === 0) {
                                     return (
-                                        <View style={{paddingHorizontal: 10, paddingVertical: 8}}>
+                                        <View style={{ paddingHorizontal: 10, paddingVertical: 8 }}>
                                             <Text>No Data Found</Text>
                                         </View>
-                                )}
+                                    )
+                                }
                                 return null
                             }}
-                            renderItem={({item, index, section}) => {
+                            renderItem={({ item, index, section }) => {
                                 // console.log("section", section)
                                 let isSelected = updateVals(section, item)
 
                                 // const isSelected = selectedTextTrack === item[section.dataAttr] ? 
-                                if(isWider){
-                                    return(
-                                        <SpatialNavigationFocusableView isFocusable onSelect={()=>{
-                                            setSelectedValue(item, section.title)
-                                            // setCurrentSelectedVal(item[section.dataAttr])
-                                            }}>
-                                        {({ isFocused }) => 
-                                        <View style={{paddingHorizontal: 20, paddingVertical: 8,backgroundColor:isFocused?'white':'black'}}>
-                                       <Text style={{color: isSelected  ? "#4682B4": isFocused?'black':'white', fontFamily: 'Montserrat-Medium', justifyContent: "center", fontSize: normalize(1.6), marginLeft: 5, alignItems: "center"}}>
-                                        {item[section.dataAttr]}
-                                       </Text>
-                                       </View>
-                                        }
-                                      </SpatialNavigationFocusableView>
-                                    )
-                                } 
-
-                                return(
-                                    <FocusText
+                                return (
+                                    <FocusButton
                                         tvParallaxProperties={{
                                             enabled: true,
                                             magnification: 1.05,
@@ -1623,89 +1690,32 @@ const ActionSheet = (props) => {
 
                                         onlyText={true}
                                         isTVSelectable={true}
-                                        onFocus={() => {}}
+                                        onFocus={() => { }}
                                         underlayColor={gray}
                                         // style={{flexDirection: "row",  marginBottom: 5, width: "100%", paddingLeft: 15}}
                                         activeOpacity={0.4}
                                         // style={{ marginBottom: 5}}
                                         // animatedStyle={{ width: "20%"}}
-                                        onPress={() => 
-                                            {
-                                                setSelectedValue(item, section.title)
-                                                // setCurrentSelectedVal(item[section.dataAttr])
-                                            }
-                                        }
-                                        value={item[section.dataAttr]}
-                                        containerStyle={{paddingHorizontal: 20, paddingVertical: 8, width : 90}}
-                                        textStyle={{color: isSelected ? "#4682B4": "white", fontFamily: 'Montserrat-Medium', justifyContent: "center", fontSize: normalize(1.6), marginLeft: 5, alignItems: "center"}}
-                                    />
-                                  
-                            )
-                        }}
-                            renderSectionHeader={({section: {title}}) => (
-                                <View style={{backgroundColor: "#1F456E", padding: 10}}>
-                                    <Text style={{ fontWeight: "700"  , color: 'white', fontFamily: 'Montserrat-Medium', justifyContent: "center", fontSize: normalize(1.6), marginLeft: 5, alignItems: "center" }}>{title}</Text>
-                                </View>
-                            )}
-                        />
-                    )
-                    : 
-                    (
-                        <SectionList 
-                            sections={settingList}
-                            scrollEnabled={true}
-                            contentContainerStyle={{marginBottom: 110, marginTop: 10}}
-                            keyExtractor={(item, index) => item + index}
-                            renderSectionFooter={({section}) => {
-                                if(section.data.length=== 0){
-                                    return (
-                                        <View style={{paddingHorizontal: 10, paddingVertical: 8}}>
-                                            <Text>No Data Found</Text>
-                                        </View>
-                                )}
-                                return null
-                            }}
-                            renderItem={({item, index, section}) => {
-                                // console.log("section", section)
-                                let isSelected = updateVals(section, item)
-
-                                // const isSelected = selectedTextTrack === item[section.dataAttr] ? 
-                                return(
-                                    <FocusButton
-                                    tvParallaxProperties={{
-                                        enabled: true,
-                                        magnification: 1.05,
-                                    }}
-                                    hasTVPreferredFocus={false}
-
-                                    onlyText={true}
-                                    isTVSelectable={true}
-                                    onFocus={() => {}}
-                                    underlayColor={gray}
-                                    // style={{flexDirection: "row",  marginBottom: 5, width: "100%", paddingLeft: 15}}
-                                    activeOpacity={0.4}
-                                    // style={{ marginBottom: 5}}
-                                    // animatedStyle={{ width: "20%"}}
-                                    onPress={() => 
-                                        {
+                                        onPress={() => {
                                             setSelectedValue(item, section.title)
                                             // setCurrentSelectedVal(item[section.dataAttr])
                                         }
-                                    }
-                                    style={{paddingHorizontal: 20, paddingVertical: 8}}>
-                                        <Text style={{color: isSelected ? "#4682B4": "white", fontFamily: 'Montserrat-Medium', justifyContent: "center", fontSize: normalize(1.6), marginLeft: 5, alignItems: "center"}}>{item[section.dataAttr]}</Text>
+                                        }
+                                        style={{ paddingHorizontal: 20, paddingVertical: 8 }}>
+                                        <Text style={{ color: isSelected ? "#4682B4" : "white", fontFamily: 'Montserrat-Medium', justifyContent: "center", fontSize: normalize(1.6), marginLeft: 5, alignItems: "center" }}>{item[section.dataAttr]}</Text>
                                     </FocusButton>
-                            )}}
-                            renderSectionHeader={({section: {title}}) => (
-                                <View style={{backgroundColor: "#1F456E", padding: 10}}>
-                                    <Text style={{ fontWeight: "700"  , color: 'white', fontFamily: 'Montserrat-Medium', justifyContent: "center", fontSize: normalize(1.6), marginLeft: 5, alignItems: "center" }}>{title}</Text>
+                                )
+                            }}
+                            renderSectionHeader={({ section: { title } }) => (
+                                <View style={{ backgroundColor: "#1F456E", padding: 10 }}>
+                                    <Text style={{ fontWeight: "700", color: 'white', fontFamily: 'Montserrat-Medium', justifyContent: "center", fontSize: normalize(1.6), marginLeft: 5, alignItems: "center" }}>{title}</Text>
                                 </View>
                             )}
                         />
                     )
 
-                }
-                {/* <ScrollView >
+            }
+            {/* <ScrollView >
                     <View >
                         {
                            settingList.map((section, settingId)=> {
@@ -1748,8 +1758,8 @@ const ActionSheet = (props) => {
                         }
                     </View>
                 </ScrollView> */}
-                
-                    {/* <View style={{width: "100%",}} >
+
+            {/* <View style={{width: "100%",}} >
                     <FocusButton
                         // key={index}
                         tvParallaxProperties={{
@@ -1880,8 +1890,8 @@ const ActionSheet = (props) => {
                     }
                     </View> */}
 
-                   
-                {/* <View>
+
+            {/* <View>
                     <Text style={{ color: 'black', alignSelf: "center", fontFamily: 'Montserrat-Medium', fontSize: normalize(1.6), marginVertical: 10 }}>
                         <FontIstoIcon size={normalize(1.7)} name={'player-settings'} /> Settings
                     </Text>
@@ -1991,32 +2001,32 @@ const ActionSheet = (props) => {
                     
                 </View> */}
 
-            </View>
-        )
-// console.log('Action sheet isFocused---',isFocused)
-//     return(
-        
-//         <SpatialNavigationScrollView  horizontal={true} style={{
-//             ...styles.modalContent, 
-//             height:  Platform.isTV || isFullScreen ? "100%" : "40%", 
-//             width:  Platform.isTV || isFullScreen ? "40%" : "100%",
-//             alignSelf: "flex-end"
-//             }} offsetFromStart={10}>
-// <SpatialNavigationFocusableView isFocusable={true}>
-// {({ isFocused }) => <Text style={{ color: isFocused ? 'red' : 'black' }}>Hello World!</Text>}
-// </SpatialNavigationFocusableView>
-// <SpatialNavigationFocusableView isFocusable={true}>
-// {({ isFocused }) => <Text style={{ color: isFocused ? 'red' : 'black' }}>Hello World!</Text>}
-// </SpatialNavigationFocusableView>
-// <SpatialNavigationFocusableView isFocusable={true}>
-// {({ isFocused }) => <Text style={{ color: isFocused ? 'red' : 'black' }}>Hello World!</Text>}
-// </SpatialNavigationFocusableView>
-// <SpatialNavigationFocusableView isFocusable={true}>
-// {({ isFocused }) => <Text style={{ color: isFocused ? 'red' : 'black' }}>Hello World!</Text>}
-// </SpatialNavigationFocusableView>
-// <Button label='dfv'/>
-// </SpatialNavigationScrollView>
-// </SpatialNavigationRoot>
+        </View>
+    )
+    // console.log('Action sheet isFocused---',isFocused)
+    //     return(
+
+    //         <SpatialNavigationScrollView  horizontal={true} style={{
+    //             ...styles.modalContent, 
+    //             height:  Platform.isTV || isFullScreen ? "100%" : "40%", 
+    //             width:  Platform.isTV || isFullScreen ? "40%" : "100%",
+    //             alignSelf: "flex-end"
+    //             }} offsetFromStart={10}>
+    // <SpatialNavigationFocusableView isFocusable={true}>
+    // {({ isFocused }) => <Text style={{ color: isFocused ? 'red' : 'black' }}>Hello World!</Text>}
+    // </SpatialNavigationFocusableView>
+    // <SpatialNavigationFocusableView isFocusable={true}>
+    // {({ isFocused }) => <Text style={{ color: isFocused ? 'red' : 'black' }}>Hello World!</Text>}
+    // </SpatialNavigationFocusableView>
+    // <SpatialNavigationFocusableView isFocusable={true}>
+    // {({ isFocused }) => <Text style={{ color: isFocused ? 'red' : 'black' }}>Hello World!</Text>}
+    // </SpatialNavigationFocusableView>
+    // <SpatialNavigationFocusableView isFocusable={true}>
+    // {({ isFocused }) => <Text style={{ color: isFocused ? 'red' : 'black' }}>Hello World!</Text>}
+    // </SpatialNavigationFocusableView>
+    // <Button label='dfv'/>
+    // </SpatialNavigationScrollView>
+    // </SpatialNavigationRoot>
     // )
 
 
@@ -2039,7 +2049,7 @@ const styles = StyleSheet.create({
         // position: "absolute",
         // bottom: 0,
 
-        
+
     },
 
     actionSheetText: {

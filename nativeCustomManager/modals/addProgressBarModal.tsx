@@ -1,11 +1,4 @@
-import React, { useEffect } from 'react';
-import { SpatialNavigationRoot, useLockSpatialNavigation, DefaultFocus } from 'react-tv-space-navigation';
-import { Button } from '../buttons';  //'../Button';
-// import { Spacer } from '../../design-system/components/Spacer';
-import { GenericModal } from './GenericModal';
-import { useIsFirstRender } from './useIsFirstRender';
-
-import ActionSheet from '../actionSheet';
+import React from 'react';
 import { PercentageBar } from '../progress';
 import { Modal } from './Modal';
 

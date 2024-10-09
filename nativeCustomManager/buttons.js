@@ -1,5 +1,5 @@
 
-import { Animated,} from 'react-native';
+import { Animated, Platform } from 'react-native';
 import {
   SpatialNavigationFocusableView,
   SpatialNavigationNode,
@@ -18,9 +18,9 @@ const ButtonContent = (props) => {
       {type === 'icon' ? (
         <Icon
           name={label}
-          size={18}
+          size={Platform.OS === 'ios' ? 25 : 18}
           color={isFocused ? 'black' : 'white'}
-          style={ { paddingHorizontal: 10 }}
+          style={{ paddingHorizontal: 10 }}
         />
       ) : (
         <StyledText isFocused={isFocused}>{label}</StyledText>
@@ -32,24 +32,23 @@ const ButtonContent = (props) => {
 ButtonContent.displayName = 'ButtonContent';
 
 export const Button = ({ label, onSelect, type }) => {
-    return (
-      <SpatialNavigationFocusableView isFocusable onSelect={onSelect}>
-        {({ isFocused }) => (
-          <ButtonContent label={label} isFocused={isFocused} type={type} />
-        )}
-      </SpatialNavigationFocusableView>
-    );
+  return (
+    <SpatialNavigationFocusableView isFocusable onSelect={onSelect}>
+      {({ isFocused }) => (
+        <ButtonContent label={label} isFocused={isFocused} type={type} />
+      )}
+    </SpatialNavigationFocusableView>
+  );
 };
 
 const Container = styled(Animated.View)(({ isFocused }) => ({
   alignSelf: 'baseline',
   backgroundColor: isFocused ? 'white' : 'transparent',
-  padding: 5,
+  padding: Platform.OS === 'ios' ? 10 : 5,
   borderRadius: 10,
 }));
 
 const StyledText = styled.Text((isFocused) => ({
-	color:isFocused? 'black' : 'white',
-	flexWrap: 'wrap',
-	// width: ,
-  }));
+  color: isFocused ? 'black' : 'white',
+  flexWrap: 'wrap',
+}));
