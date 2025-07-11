@@ -1646,6 +1646,7 @@ export default class VideoPlayer extends Component {
 				<Button
 					label={'chevron-left'}
 					type={'icon'}
+					name="back"
 					onFocus={() => this.resetControlTimeout()}
 					onSelect={() => {
 						if (this.state.showControls) {
@@ -1659,6 +1660,7 @@ export default class VideoPlayer extends Component {
 		}
 		return this.renderControl(
 			<Image
+				testID={`com.testapp:id/back`}
 				source={require('./assets/img/back.png')}
 				style={styles.controls.back}
 			/>,
@@ -1683,6 +1685,7 @@ export default class VideoPlayer extends Component {
 					style={[styles.volume.handle, { left: this.state.volumePosition }]}
 					{...this.player.volumePanResponder.panHandlers}>
 					<Image
+						testID={`com.testapp:id/volume`}
 						style={styles.volume.icon}
 						source={require('./assets/img/volume.png')}
 					/>
@@ -1701,7 +1704,7 @@ export default class VideoPlayer extends Component {
 					? 'compress-arrows-alt'
 					: 'expend-arrows-alt';
 			return (
-				(<Button label={source} type={'icon'} onSelect={this.methods.toggleFullscreen} />)
+				(<Button name={"fullScreen"} label={source} type={'icon'} onSelect={this.methods.toggleFullscreen} />)
 			)
 		}
 
@@ -1710,7 +1713,7 @@ export default class VideoPlayer extends Component {
 				? require('./assets/img/shrink.png')
 				: require('./assets/img/expand.png');
 		return this.renderControl(
-			<Image source={source} />,
+			<Image testID={`com.testapp:id/fullScreen`} source={source} />,
 			this.methods.toggleFullscreen,
 			styles.controls.fullscreen,
 		);
